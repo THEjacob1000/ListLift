@@ -1,0 +1,410 @@
+"use client";
+
+import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { addDays, format } from "date-fns";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+} from "@/components/ui/form";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { Separator } from "./ui/separator";
+import {
+  CalendarIcon,
+  Circle,
+  CircleCheckBig,
+  Flag,
+  X,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./ui/popover";
+
+import { cn } from "@/lib/utils";
+import { Calendar } from "./ui/calendar";
+
+enum Priority {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+}
+
+const formSchema = z.object({
+  title: z.string().min(2).max(50),
+  description: z.string().min(0).max(500).optional(),
+  deadline: z.date().nullable().optional(),
+  priority: z.string(),
+  category: z.string().optional(),
+  completed: z.boolean().optional(),
+});
+
+interface AddTaskProps {
+  categories: string[];
+}
+
+const AddTask = ({ categories = [] }: AddTaskProps) => {
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      deadline: null as Date | null,
+      priority: "LOW",
+      category: "",
+      completed: false,
+    },
+  });
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log("Form Submitted:", values);
+  };
+  const completedOptions = [
+    { label: "Todo", value: false },
+    { label: "Completed", value: true },
+  ];
+  const priorityOptions = [
+    { label: "Low", value: "LOW" },
+    { label: "Medium", value: "MEDIUM" },
+    { label: "High", value: "HIGH" },
+  ];
+  const getPriorityColor = (priority: Priority): string => {
+    switch (priority) {
+      case Priority.LOW:
+        return "#808080";
+      case Priority.MEDIUM:
+        return "#FFFF00";
+      case Priority.HIGH:
+        return "#FF0000";
+      default:
+        return "#000000";
+    }
+  };
+
+  const handleDatePreset = (days: number) => {
+    const newDate = addDays(new Date(), days);
+    form.setValue("deadline", newDate, { shouldValidate: true });
+  };
+  const datePresets = [
+    { label: "Today", value: 0 },
+    { label: "Tomorrow", value: 1 },
+    { label: "In 3 days", value: 3 },
+    { label: "In 1 week", value: 7 },
+  ];
+
+  return (
+    <Dialog>
+      <DialogTrigger className="ml-2 bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4">
+        Add Task
+      </DialogTrigger>
+      <DialogContent className="min-w-[80vw]">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="grid grid-cols-10"
+          >
+            <div className="col-span-6 flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder="Task name"
+                        className="w-full p-2 bg-card focus:border-none active:border-none focus:outline-none border-none outline-none text-xl focus-visible:ring-transparent"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Separator />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Description"
+                        className="w-full p-2 bg-card h-[40vh] text-md border-none outline-none"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Separator
+              orientation="vertical"
+              className="col-span-1 ml-4"
+            />
+            <div className="col-span-3 grid grid-cols-2 gap-4 p-4 items-start">
+              <span className="text-muted-foreground">Status</span>
+              <FormField
+                control={form.control}
+                name="completed"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button
+                            variant={"ghost"}
+                            className="flex gap-2 w-32 justify-start"
+                          >
+                            {field.value ? (
+                              <CircleCheckBig
+                                color="#00FF00"
+                                size={16}
+                              />
+                            ) : (
+                              <Circle size={16} />
+                            )}
+                            {field.value
+                              ? completedOptions.find(
+                                  (option) =>
+                                    option.value === field.value
+                                )?.label
+                              : "Todo"}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {completedOptions.map((option) => (
+                            <DropdownMenuItem
+                              key={option.label}
+                              onClick={() =>
+                                field.onChange(option.value)
+                              }
+                              className="flex gap-2 cursor-pointer"
+                            >
+                              {option.value ? (
+                                <CircleCheckBig
+                                  color="#00FF00"
+                                  size={16}
+                                />
+                              ) : (
+                                <Circle size={16} />
+                              )}
+                              {option.label}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <span className="text-muted-foreground">Priority</span>
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button
+                            variant={"ghost"}
+                            className="flex gap-2 px-6 justify-start w-32"
+                          >
+                            <Flag
+                              color={
+                                field.value === "LOW"
+                                  ? "#808080"
+                                  : field.value === "MEDIUM"
+                                  ? "#FFFF00"
+                                  : "#FF0000"
+                              }
+                              size={20}
+                            />
+                            {field.value
+                              ? priorityOptions.find(
+                                  (option) =>
+                                    option.value === field.value
+                                )?.label
+                              : "Todo"}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {Object.values(Priority).map((priority) => (
+                            <DropdownMenuItem
+                              key={priority}
+                              onClick={() =>
+                                form.setValue(
+                                  "priority",
+                                  priority as Priority
+                                )
+                              }
+                              className="flex gap-2 cursor-pointer"
+                            >
+                              <Flag
+                                color={getPriorityColor(priority)}
+                                size={20}
+                              />
+                              {priority}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <Separator className="col-span-2" />
+              <span className="text-muted-foreground">Deadline</span>
+              <FormField
+                control={form.control}
+                name="deadline"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>No deadline</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-fit p-0 flex mr-8"
+                        align="start"
+                      >
+                        <div className="flex flex-col">
+                          <Button
+                            variant={"ghost"}
+                            className="flex gap-2 justify-start items-center"
+                            onClick={() =>
+                              form.setValue("deadline", null, {
+                                shouldValidate: true,
+                              })
+                            }
+                          >
+                            <CalendarIcon
+                              className="h-6 w-6"
+                              color="#808080"
+                            />
+                            {field.value ? (
+                              <div className="text-xs inline-flex gap-2 items-center">
+                                {format(field.value, "EEE MMM dd")}
+                                <X size={12} color="#808080" />
+                              </div>
+                            ) : (
+                              "None"
+                            )}
+                          </Button>
+                          <Calendar
+                            className="col-span-1"
+                            mode="single"
+                            selected={field.value || undefined}
+                            onSelect={field.onChange}
+                            disabled={(date: Date) =>
+                              date < new Date()
+                            }
+                            initialFocus
+                          />
+                        </div>
+
+                        <div className="col-span-1 flex flex-col bg-black/20 w-fit">
+                          {datePresets.map((preset) => (
+                            <Button
+                              key={preset.label}
+                              variant="ghost"
+                              className="flex justify-between gap-4"
+                              onClick={() =>
+                                handleDatePreset(preset.value)
+                              }
+                            >
+                              {preset.label}
+                              <span className="text-muted-foreground">
+                                {format(
+                                  addDays(new Date(), preset.value),
+                                  "EEE MMM dd"
+                                )}
+                              </span>
+                            </Button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </FormItem>
+                )}
+              />
+              <Separator className="col-span-2" />
+              <span className="text-muted-foreground">Category</span>
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>
+                          <Button
+                            variant={"ghost"}
+                            className="flex gap-2 px-6 justify-start w-32"
+                          >
+                            {field.value
+                              ? categories.find(
+                                  (category) =>
+                                    category === field.value
+                                )
+                              : "None"}
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          {categories.map((category) => (
+                            <DropdownMenuItem
+                              key={category}
+                              onClick={() => field.onChange(category)}
+                              className="flex gap-2 cursor-pointer"
+                            >
+                              {category}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Separator className="col-span-10" />
+            <div className="col-span-10 flex justify-end mt-4 gap-2">
+              <Button variant="outline" onClick={() => form.reset()}>
+                Cancel
+              </Button>
+              <Button type="submit">Add Task</Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default AddTask;

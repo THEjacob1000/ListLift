@@ -28,6 +28,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -39,6 +44,7 @@ import {
 import { Boxes, ChevronDown, ChevronUp } from "lucide-react";
 import { capitalize } from "@/lib/utils";
 import { Task } from "@/lib/types";
+import AddTask from "../AddTask";
 
 interface DataTableProps<TData extends Task, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -88,10 +94,17 @@ export function DataTable<TData extends Task, TValue>({
     { id: "category", name: "Category" },
     { id: "priority", name: "Priority" },
   ];
+  const categoryNames = Array.from(
+    new Set(
+      data
+        .map((entry) => entry.category)
+        .filter((category): category is string => !!category)
+    )
+  );
 
   return (
-    <div>
-      <div className="flex items-center py-4">
+    <div className="mt-6">
+      <div className="flex items-center w-full justify-between py-4">
         <div className="inline-flex gap-2">
           <Input
             placeholder="Filter tasks..."
@@ -148,34 +161,35 @@ export function DataTable<TData extends Task, TValue>({
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              View
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                View
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {table
+                .getAllColumns()
+                .filter((column) => column.getCanHide())
+                .map((column) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }
+                    >
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  );
+                })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <AddTask categories={categoryNames} />
       </div>
       <div className="rounded-md border">
         <Table>
