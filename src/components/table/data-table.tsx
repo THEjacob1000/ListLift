@@ -36,7 +36,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { Boxes } from "lucide-react";
+import { Boxes, ChevronDown, ChevronUp } from "lucide-react";
 import { capitalize } from "@/lib/utils";
 import { Task } from "@/lib/types";
 
@@ -55,6 +55,15 @@ export function DataTable<TData extends Task, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [grouping, setGrouping] = React.useState<GroupingState>([]);
+  const [collapsedGroups, setCollapsedGroups] = React.useState<{
+    [key: string]: boolean;
+  }>({});
+  const toggleGroup = (groupId: string | number) => {
+    setCollapsedGroups((prev: { [key: string]: boolean }) => ({
+      ...prev,
+      [groupId]: !prev[groupId],
+    }));
+  };
 
   const table = useReactTable({
     data,
@@ -112,9 +121,17 @@ export function DataTable<TData extends Task, TValue>({
             <DropdownMenuContent align="start">
               <DropdownMenuRadioGroup
                 value={grouping[0]}
-                onValueChange={(value) =>
-                  setGrouping(value ? [value] : [])
-                }
+                onValueChange={(value) => {
+                  setGrouping(value ? [value] : []);
+                  const newVisibility: VisibilityState = {};
+                  table.getAllColumns().forEach((column) => {
+                    newVisibility[column.id] = true;
+                  });
+                  if (value) {
+                    newVisibility[value] = false;
+                  }
+                  table.setColumnVisibility(newVisibility);
+                }}
               >
                 {groupOptions.map((option) => (
                   <DropdownMenuRadioItem
@@ -182,33 +199,42 @@ export function DataTable<TData extends Task, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.map((row) => {
-              if (row.subRows && row.subRows.length > 0) {
-                const groupingColumnId = grouping[0] || "No Category";
+              const isGrouped = row.subRows && row.subRows.length > 0;
+              const groupingColumnId = grouping[0] || "No Category";
+              const groupId = row.original[groupingColumnId];
+
+              if (isGrouped) {
+                const isCollapsed = collapsedGroups[groupId];
                 return (
                   <React.Fragment key={row.id}>
-                    <TableRow>
+                    <TableRow
+                      onClick={() => toggleGroup(groupId)}
+                      style={{ cursor: "pointer" }}
+                    >
                       <TableCell colSpan={columns.length}>
-                        <strong>
-                          {capitalize(
-                            (row.original as { [key: string]: any })[
-                              groupingColumnId
-                            ]
+                        <strong className="flex gap-2 items-center">
+                          {capitalize(groupId)}{" "}
+                          {isCollapsed ? (
+                            <ChevronDown />
+                          ) : (
+                            <ChevronUp />
                           )}
                         </strong>
                       </TableCell>
                     </TableRow>
-                    {row.subRows.map((subRow) => (
-                      <TableRow key={subRow.id}>
-                        {subRow.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
+                    {!isCollapsed &&
+                      row.subRows.map((subRow) => (
+                        <TableRow key={subRow.id}>
+                          {subRow.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
                   </React.Fragment>
                 );
               } else {

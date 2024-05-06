@@ -6,4 +6,5 @@ export type Task = {
   deadline?: string;
   completed: boolean;
   category?: string;
+  [key: string]: any;
 };
