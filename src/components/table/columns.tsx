@@ -1,5 +1,3 @@
-"use client";
-
 import { Task } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
@@ -20,7 +18,9 @@ export const columns: ColumnDef<Task>[] = [
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div>{getValue() as React.ReactNode}</div>
+      <div className="text-left ml-4">
+        {getValue() as React.ReactNode}
+      </div>
     ),
   },
   {
@@ -37,7 +37,9 @@ export const columns: ColumnDef<Task>[] = [
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div>{getValue() as React.ReactNode}</div>
+      <div className="text-left ml-4">
+        {getValue() as React.ReactNode}
+      </div>
     ),
   },
   {
@@ -54,7 +56,7 @@ export const columns: ColumnDef<Task>[] = [
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div className="text-left font-medium">
+      <div className="text-left ml-4 font-medium">
         {getValue() as React.ReactNode}
       </div>
     ),
@@ -73,6 +75,7 @@ export const columns: ColumnDef<Task>[] = [
       </Button>
     ),
     cell: ({ getValue }) => {
+      if (!getValue()) return null;
       const deadline = new Date(getValue() as string);
       const formatted = deadline.toLocaleDateString("en-US", {
         year: "numeric",
@@ -80,7 +83,7 @@ export const columns: ColumnDef<Task>[] = [
         day: "numeric",
       });
       return (
-        <div className="text-right font-medium">{formatted}</div>
+        <div className="text-left ml-4 font-medium">{formatted}</div>
       );
     },
   },
@@ -98,8 +101,8 @@ export const columns: ColumnDef<Task>[] = [
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div className="text-center">
-        {(getValue() as boolean) ? "Yes" : "No"}
+      <div className="text-left ml-4">
+        {getValue() ? ((getValue() as boolean) ? "Yes" : "No") : null}
       </div>
     ),
   },
@@ -117,7 +120,9 @@ export const columns: ColumnDef<Task>[] = [
       </Button>
     ),
     cell: ({ getValue }) => (
-      <div>{getValue() as React.ReactNode}</div>
+      <div className="text-left ml-4">
+        {getValue() as React.ReactNode}
+      </div>
     ),
   },
 ];

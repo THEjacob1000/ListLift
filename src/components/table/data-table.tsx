@@ -11,6 +11,8 @@ import {
   ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
+  getGroupedRowModel,
+  GroupingState,
   VisibilityState,
   useReactTable,
 } from "@tanstack/react-table";
@@ -29,17 +31,21 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 import { Boxes } from "lucide-react";
+import { capitalize } from "@/lib/utils";
+import { Task } from "@/lib/types";
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends Task, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends Task, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -48,10 +54,7 @@ export function DataTable<TData, TValue>({
     React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
-  const [isGrouped, setIsGrouped] = React.useState(false);
-  const [groupType, setGroupType] = React.useState<
-    "category" | "priority" | null
-  >(null);
+  const [grouping, setGrouping] = React.useState<GroupingState>([]);
 
   const table = useReactTable({
     data,
@@ -63,13 +66,19 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    getGroupedRowModel: getGroupedRowModel(),
 
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      grouping,
     },
   });
+  const groupOptions = [
+    { id: "category", name: "Category" },
+    { id: "priority", name: "Priority" },
+  ];
 
   return (
     <div>
@@ -92,38 +101,34 @@ export function DataTable<TData, TValue>({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant={isGrouped ? "default" : "outline"}
+                variant={grouping.length > 0 ? "default" : "outline"}
                 className="ml-auto"
               >
                 <Boxes size={16} className="mr-2" />
-                Group By{isGrouped && `: ${groupType}`}
+                Group By:{" "}
+                {grouping.length ? capitalize(grouping[0]) : "None"}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuCheckboxItem
-                checked={groupType === "category"}
-                onCheckedChange={(value) =>
-                  setGroupType(value ? "category" : null)
+            <DropdownMenuContent align="start">
+              <DropdownMenuRadioGroup
+                value={grouping[0]}
+                onValueChange={(value) =>
+                  setGrouping(value ? [value] : [])
                 }
               >
-                Category
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={groupType === "priority"}
-                onCheckedChange={(value) =>
-                  setGroupType(value ? "priority" : null)
-                }
-              >
-                Priority
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={groupType === null}
-                onCheckedChange={(value) =>
-                  setGroupType(value ? null : null)
-                }
-              >
-                None
-              </DropdownMenuCheckboxItem>
+                {groupOptions.map((option) => (
+                  <DropdownMenuRadioItem
+                    key={option.id}
+                    value={option.id}
+                    className="pr-20"
+                  >
+                    {option.name}
+                  </DropdownMenuRadioItem>
+                ))}
+                <DropdownMenuRadioItem value="" className="pr-20">
+                  None
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -176,32 +181,51 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
+            {table.getRowModel().rows.map((row) => {
+              if (row.subRows && row.subRows.length > 0) {
+                const groupingColumnId = grouping[0] || "No Category";
+                return (
+                  <React.Fragment key={row.id}>
+                    <TableRow>
+                      <TableCell colSpan={columns.length}>
+                        <strong>
+                          {capitalize(
+                            (row.original as { [key: string]: any })[
+                              groupingColumnId
+                            ]
+                          )}
+                        </strong>
+                      </TableCell>
+                    </TableRow>
+                    {row.subRows.map((subRow) => (
+                      <TableRow key={subRow.id}>
+                        {subRow.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </React.Fragment>
+                );
+              } else {
+                return (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              }
+            })}
           </TableBody>
         </Table>
       </div>
