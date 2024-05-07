@@ -77,6 +77,8 @@ interface TaskFormProps {
   categories: string[];
   setIsOpen: (isOpen: boolean) => void;
   isOpen: boolean;
+  type: "new" | "edit";
+  onDelete?: () => void;
 }
 
 const TaskForm = ({
@@ -84,7 +86,8 @@ const TaskForm = ({
   onSubmit,
   categories,
   setIsOpen,
-  isOpen,
+  type,
+  onDelete,
 }: TaskFormProps) => {
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -478,20 +481,32 @@ const TaskForm = ({
             />
           </div>
           <Separator className="col-span-10" />
-          <div className="col-span-10 flex justify-end mt-4 gap-2">
-            <Button
-              variant="outline"
-              onClick={() => {
-                form.reset();
-                setIsOpen(false);
-              }}
-              type="button"
-            >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={title.length < 3}>
-              Add Task
-            </Button>
+          <div className="col-span-10 flex justify-between mt-4 gap-2">
+            {type === "new" && <div />}
+            {type === "edit" && (
+              <Button
+                variant={"destructive"}
+                type="button"
+                onClick={onDelete}
+              >
+                Delete
+              </Button>
+            )}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  form.reset();
+                  setIsOpen(false);
+                }}
+                type="button"
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={title.length < 3}>
+                Add Task
+              </Button>
+            </div>
           </div>
         </form>
       </Form>

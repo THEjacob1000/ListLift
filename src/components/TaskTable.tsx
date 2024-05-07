@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 const TaskTable = () => {
   const [data, setData] = useState<Task[]>([]);
-  const { loading, data: queryData } = useQuery(FETCH_TASKS);
+  const { loading, data: queryData, refetch } = useQuery(FETCH_TASKS);
   useEffect(() => {
     if (!loading && queryData) {
       const tasks = queryData.getAllTasks as Task[];

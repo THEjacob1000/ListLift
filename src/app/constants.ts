@@ -17,6 +17,7 @@ export const FETCH_TASKS = gql`
 export const CREATE_TASK = gql`
   mutation createTask($input: NewTaskInput!) {
     createTask(input: $input) {
+      id
       title
       description
       priority
@@ -50,6 +51,15 @@ export const FIND_TASK = gql`
       description
       priority
       title
+    }
+  }
+`;
+
+export const DELETE_TASK = gql`
+  mutation DeleteTask($id: ID!) {
+    deleteTask(id: $id) {
+      id
+      success
     }
   }
 `;

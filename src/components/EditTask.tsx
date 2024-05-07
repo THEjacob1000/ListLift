@@ -1,7 +1,12 @@
 "use client";
 import { useMutation, useQuery } from "@apollo/client";
 import TaskForm from "./TaskForm";
-import { FETCH_TASKS, FIND_TASK, UPDATE_TASK } from "@/app/constants";
+import {
+  DELETE_TASK,
+  FETCH_TASKS,
+  FIND_TASK,
+  UPDATE_TASK,
+} from "@/app/constants";
 import { useEffect, useState } from "react";
 import { Task, formSchema } from "@/lib/types";
 import { useForm } from "react-hook-form";
@@ -13,6 +18,9 @@ import { Dialog, DialogTrigger } from "./ui/dialog";
 interface EditTaskProps {
   id: string;
   title: string;
+}
+interface TasksData {
+  getAllTasks: Task[];
 }
 
 const EditTask = ({ id, title }: EditTaskProps) => {
@@ -44,10 +52,35 @@ const EditTask = ({ id, title }: EditTaskProps) => {
   });
   const { toast } = useToast();
   const [updateTask] = useMutation(UPDATE_TASK);
+  const [deleteTask] = useMutation(DELETE_TASK, {
+    update: (cache, { data }) => {
+      if (data.deleteTask.success) {
+        const deletedTaskId = data.deleteTask.id;
+
+        const existingTasks = cache.readQuery<TasksData>({
+          query: FETCH_TASKS,
+        });
+        if (existingTasks) {
+          const updatedTasks = existingTasks.getAllTasks.filter(
+            (task) => task.id !== deletedTaskId
+          );
+
+          cache.writeQuery<TasksData>({
+            query: FETCH_TASKS,
+            data: { getAllTasks: updatedTasks },
+          });
+        }
+      } else {
+        // Log or handle the unsuccessful deletion message
+        console.error(data.deleteTask.message);
+      }
+    },
+  });
   useEffect(() => {
     if (!loading && queryData) {
       const task = queryData.getTask as Task;
       setData(task);
+      if (!task) return;
       form.reset({
         title: task.title,
         description: task.description,
@@ -111,6 +144,31 @@ const EditTask = ({ id, title }: EditTaskProps) => {
     }
   };
 
+  const onDelete = async () => {
+    console.log("Attempting to delete the task");
+    try {
+      const response = await deleteTask({ variables: { id: id } });
+      if (response.data.deleteTask.success) {
+        toast({
+          title: "Task deleted",
+          description: "The task has been deleted successfully",
+          status: "success",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Task could not be deleted",
+          status: "error",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "An error occurred",
+        description: error.message,
+        status: "error",
+      });
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden">
@@ -125,6 +183,8 @@ const EditTask = ({ id, title }: EditTaskProps) => {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         onSubmit={onSubmit}
+        type="edit"
+        onDelete={onDelete}
       />
     </Dialog>
   );

@@ -7,13 +7,16 @@ import { useForm } from "react-hook-form";
 
 import { useState } from "react";
 import { useMutation } from "@apollo/client";
-import { CREATE_TASK } from "@/app/constants";
+import { CREATE_TASK, FETCH_TASKS } from "@/app/constants";
 import { useToast } from "./ui/use-toast";
 import TaskForm from "./TaskForm";
-import { formSchema } from "@/lib/types";
+import { Task, formSchema } from "@/lib/types";
 
 interface AddTaskProps {
   categories: string[];
+}
+interface TasksData {
+  getAllTasks: Task[];
 }
 
 const AddTask = ({ categories = [] }: AddTaskProps) => {
@@ -54,6 +57,22 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
             completed,
           },
         },
+        update: (cache, { data }) => {
+          const existingTasks = cache.readQuery<TasksData>({
+            query: FETCH_TASKS,
+          });
+          if (existingTasks && data.createTask) {
+            cache.writeQuery<TasksData>({
+              query: FETCH_TASKS,
+              data: {
+                getAllTasks: [
+                  ...existingTasks.getAllTasks,
+                  data.createTask,
+                ],
+              },
+            });
+          }
+        },
       });
       form.reset();
       setIsOpen(false);
@@ -82,6 +101,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
         onSubmit={onSubmit}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
+        type={"new"}
       />
     </Dialog>
   );
