@@ -52,25 +52,21 @@ const resolvers: Resolvers = {
       }
     },
     deleteTask: async (_, { id }, context) => {
-      const task = await context.dataSources.tasks.getTaskById(id);
-      if (!task) {
+      const deleteResult = await context.dataSources.tasks.deleteTask(
+        { id }
+      );
+      if (!deleteResult.success) {
         return {
           id: "",
           success: false,
-          message: "Task not found, unable to delete.",
+          message: deleteResult.message,
         };
       }
-      try {
-        await context.dataSources.tasks.deleteTask(id);
-        return {
-          id: id,
-          success: true,
-          message: "Task successfully deleted.",
-        };
-      } catch (error) {
-        console.error("Error deleting the task:", error);
-        throw new Error("Failed to delete task");
-      }
+      return {
+        id: id,
+        success: true,
+        message: "Task successfully deleted.",
+      };
     },
   },
 };

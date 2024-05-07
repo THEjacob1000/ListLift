@@ -58,12 +58,23 @@ export default class Tasks extends MongoDataSource<TaskDocument> {
   }
 
   // Function to delete a task
-  async deleteTask({ id }: { id: string }): Promise<string> {
+  async deleteTask({
+    id,
+  }: {
+    id: string;
+  }): Promise<{ success: boolean; message: string }> {
     try {
-      await TaskModel.findByIdAndDelete(id);
-      return "Task deleted successfully";
+      const result = await TaskModel.findByIdAndDelete(id);
+      if (!result) {
+        return {
+          success: false,
+          message: "No task found with that ID.",
+        };
+      }
+      return { success: true, message: "Task deleted successfully" };
     } catch (error) {
-      throw new Error("Failed to delete task");
+      console.error("Error deleting task:", error);
+      return { success: false, message: "Failed to delete task" };
     }
   }
 }
