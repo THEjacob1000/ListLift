@@ -42,26 +42,39 @@ export default class Tasks extends MongoDataSource<TaskDocument> {
   }
 
   // Function to update an existing task
-  async updateTask(
-    id: string,
-    taskInput: Partial<TaskDocument>
-  ): Promise<TaskDocument | null> {
+  async updateTask({ input }: any) {
     try {
-      return await TaskModel.findByIdAndUpdate(id, taskInput, {
-        new: true,
-      });
+      const updatedTask = await TaskModel.findByIdAndUpdate(
+        input.id,
+        { ...input },
+        {
+          new: true,
+        }
+      );
+      return updatedTask;
     } catch (error) {
-      throw new Error("Failed to update task");
+      throw new Error("Failed to update user");
     }
   }
 
   // Function to delete a task
-  async deleteTask(id: string): Promise<boolean> {
+  async deleteTask({
+    id,
+  }: {
+    id: string;
+  }): Promise<{ success: boolean; message: string }> {
     try {
       const result = await TaskModel.findByIdAndDelete(id);
-      return result != null;
+      if (!result) {
+        return {
+          success: false,
+          message: "No task found with that ID.",
+        };
+      }
+      return { success: true, message: "Task deleted successfully" };
     } catch (error) {
-      throw new Error("Failed to delete task");
+      console.error("Error deleting task:", error);
+      return { success: false, message: "Failed to delete task" };
     }
   }
 }

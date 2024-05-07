@@ -1,12 +1,15 @@
-"use client";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import Heading from "@/components/Heading";
+import Options from "@/components/Options";
 
 export default function Home() {
-  const router = useRouter();
-  useEffect(() => {
-    router.push("/calendar");
-  }, [router]);
-
-  return <div>Hello World</div>;
+  return (
+    <div className="bg-accent">
+      <Heading as="h1" size="md" className="py-2 px-5">
+        ListLift
+      </Heading>
+      <div className="bg-background pt-6">
+        <Options />
+      </div>
+    </div>
+  );
 }

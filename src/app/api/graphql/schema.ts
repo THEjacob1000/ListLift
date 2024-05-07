@@ -21,6 +21,7 @@ const typeDefs = `#graphql
     priority: Priority!
     deadline: String
     category: String
+    completed: Boolean
   }
 
   input UpdateTaskInput {
@@ -44,11 +45,16 @@ const typeDefs = `#graphql
     completed: Boolean
     category: String
   }
+  type DeleteTaskResult {
+    id: ID!
+    success: Boolean!
+    message: String!
+  }
 
   type Mutation {
     createTask(input: NewTaskInput!): Task
     updateTask(input: UpdateTaskInput!): Task
-    deleteTask(id: ID!): Boolean
+    deleteTask(id: ID!): DeleteTaskResult!
   }
 `;
 

@@ -44,19 +44,29 @@ const resolvers: Resolvers = {
         );
       }
     },
-    updateTask: async (_, { id, input }, { dataSources }) => {
+    updateTask: async (_: any, { input }: any, context: any) => {
       try {
-        return await dataSources.tasks.updateTask(id, input);
+        return await context.dataSources.tasks.updateTask({ input });
       } catch (error) {
         throw new Error("Failed to update task");
       }
     },
-    deleteTask: async (_, { id }, { dataSources }) => {
-      try {
-        return await dataSources.tasks.deleteTask(id);
-      } catch (error) {
-        throw new Error("Failed to delete task");
+    deleteTask: async (_, { id }, context) => {
+      const deleteResult = await context.dataSources.tasks.deleteTask(
+        { id }
+      );
+      if (!deleteResult.success) {
+        return {
+          id: "",
+          success: false,
+          message: deleteResult.message,
+        };
       }
+      return {
+        id: id,
+        success: true,
+        message: "Task successfully deleted.",
+      };
     },
   },
 };
