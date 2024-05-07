@@ -45,6 +45,7 @@ import { Boxes, ChevronDown, ChevronUp } from "lucide-react";
 import { capitalize } from "@/lib/utils";
 import { Task } from "@/lib/types";
 import AddTask from "../AddTask";
+import DeleteCompleted from "../DeleteCompleted";
 
 interface DataTableProps<TData extends Task, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -191,7 +192,10 @@ export function DataTable<TData extends Task, TValue>({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <AddTask categories={categoryNames} />
+        <div className="flex gap-2">
+          <DeleteCompleted />
+          <AddTask categories={categoryNames} />
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
