@@ -3,8 +3,14 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import EditTask from "../EditTask";
+import TaskCheckbox from "../TaskCheckbox";
 
 export const columns: ColumnDef<Task>[] = [
+  {
+    accessorKey: "checkbox",
+    header: () => <div className="sr-only">Checkbox</div>,
+    cell: ({ row }) => <TaskCheckbox id={row.original.id} />,
+  },
   {
     accessorKey: "title",
     header: ({ column }) => (
