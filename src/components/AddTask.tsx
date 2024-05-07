@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogOverlay,
+  DialogTrigger,
+} from "./ui/dialog";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,11 +27,15 @@ import {
   CircleCheckBig,
   Flag,
   X,
+  Plus,
 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import {
@@ -36,6 +46,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import { Calendar } from "./ui/calendar";
+import { useState } from "react";
 
 enum Priority {
   LOW = "LOW",
@@ -57,6 +68,9 @@ interface AddTaskProps {
 }
 
 const AddTask = ({ categories = [] }: AddTaskProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [newCategoryOpen, setNewCategoryOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,6 +82,8 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
       completed: false,
     },
   });
+  const title = form.watch("title");
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log("Form Submitted:", values);
   };
@@ -105,7 +121,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
   ];
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="ml-2 bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4">
         Add Task
       </DialogTrigger>
@@ -163,7 +179,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
                       <DropdownMenu>
                         <DropdownMenuTrigger>
                           <Button
-                            variant={"ghost"}
+                            variant={"outline"}
                             className="flex gap-2 w-32 justify-start"
                           >
                             {field.value ? (
@@ -218,7 +234,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
                       <DropdownMenu>
                         <DropdownMenuTrigger>
                           <Button
-                            variant={"ghost"}
+                            variant={"outline"}
                             className="flex gap-2 px-6 justify-start w-32"
                           >
                             <Flag
@@ -362,32 +378,106 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <Button
-                            variant={"ghost"}
-                            className="flex gap-2 px-6 justify-start w-32"
-                          >
-                            {field.value
-                              ? categories.find(
-                                  (category) =>
-                                    category === field.value
-                                )
-                              : "None"}
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          {categories.map((category) => (
-                            <DropdownMenuItem
-                              key={category}
-                              onClick={() => field.onChange(category)}
-                              className="flex gap-2 cursor-pointer"
+                      <Dialog
+                        open={newCategoryOpen}
+                        onOpenChange={setNewCategoryOpen}
+                      >
+                        <DialogOverlay
+                          onClick={(e) => e.stopPropagation()}
+                        />
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button
+                              variant={"outline"}
+                              className="flex gap-2 px-6 justify-start w-32"
                             >
-                              {category}
+                              {field.value
+                                ? categories.find(
+                                    (category) =>
+                                      category === field.value
+                                  )
+                                : "None"}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuRadioGroup
+                              value={selectedCategory}
+                              onValueChange={setSelectedCategory}
+                            >
+                              <DropdownMenuRadioItem
+                                onClick={() => field.onChange("")}
+                                value={""}
+                                className="cursor-pointer text-muted-foreground"
+                              >
+                                None
+                              </DropdownMenuRadioItem>
+                              {categories.map((category) => (
+                                <DropdownMenuRadioItem
+                                  key={category}
+                                  onClick={() =>
+                                    field.onChange(category)
+                                  }
+                                  value={category}
+                                  className="flex gap-2 cursor-pointer"
+                                >
+                                  {category}
+                                </DropdownMenuRadioItem>
+                              ))}
+                            </DropdownMenuRadioGroup>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => field.onChange("")}
+                              className="cursor-pointer"
+                            >
+                              <DialogTrigger
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex gap-2 items-center"
+                              >
+                                <Plus size={16} />
+                                New category
+                              </DialogTrigger>
+                              <DialogContent
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <DialogHeader>
+                                  Add new Category
+                                </DialogHeader>
+                                <FormField
+                                  control={form.control}
+                                  name="category"
+                                  render={({ field }) => (
+                                    <FormControl>
+                                      <Input
+                                        placeholder="Category name"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                  )}
+                                />
+                                <div className="inline-flex gap-2 justify-end">
+                                  <Button
+                                    variant={"secondary"}
+                                    onClick={() =>
+                                      setNewCategoryOpen(false)
+                                    }
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    onClick={() => {
+                                      categories.push(field.value);
+                                      setNewCategoryOpen(false);
+                                    }}
+                                  >
+                                    Add Category
+                                  </Button>
+                                </div>
+                              </DialogContent>
                             </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </Dialog>
                     </FormControl>
                   </FormItem>
                 )}
@@ -395,10 +485,18 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
             </div>
             <Separator className="col-span-10" />
             <div className="col-span-10 flex justify-end mt-4 gap-2">
-              <Button variant="outline" onClick={() => form.reset()}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  form.reset();
+                  setIsOpen(false);
+                }}
+              >
                 Cancel
               </Button>
-              <Button type="submit">Add Task</Button>
+              <Button type="submit" disabled={title.length < 3}>
+                Add Task
+              </Button>
             </div>
           </form>
         </Form>
