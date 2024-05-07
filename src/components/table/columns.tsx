@@ -2,6 +2,7 @@ import { Task } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
+import EditTask from "../EditTask";
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -17,9 +18,9 @@ export const columns: ColumnDef<Task>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ getValue }) => (
+    cell: ({ row }) => (
       <div className="text-left ml-4">
-        {getValue() as React.ReactNode}
+        <EditTask id={row.original.id} title={row.original.title} />
       </div>
     ),
   },

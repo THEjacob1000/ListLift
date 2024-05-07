@@ -26,3 +26,30 @@ export const CREATE_TASK = gql`
     }
   }
 `;
+
+export const UPDATE_TASK = gql`
+  mutation updateTask($input: UpdateTaskInput!) {
+    updateTask(input: $input) {
+      title
+      description
+      priority
+      deadline
+      completed
+      category
+      id
+    }
+  }
+`;
+
+export const FIND_TASK = gql`
+  query findTask($getTaskId: ID!) {
+    getTask(id: $getTaskId) {
+      category
+      completed
+      deadline
+      description
+      priority
+      title
+    }
+  }
+`;

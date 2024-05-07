@@ -42,16 +42,18 @@ export default class Tasks extends MongoDataSource<TaskDocument> {
   }
 
   // Function to update an existing task
-  async updateTask(
-    id: string,
-    taskInput: Partial<TaskDocument>
-  ): Promise<TaskDocument | null> {
+  async updateTask({ input }: any) {
     try {
-      return await TaskModel.findByIdAndUpdate(id, taskInput, {
-        new: true,
-      });
+      const updatedTask = await TaskModel.findByIdAndUpdate(
+        input.id,
+        { ...input },
+        {
+          new: true,
+        }
+      );
+      return updatedTask;
     } catch (error) {
-      throw new Error("Failed to update task");
+      throw new Error("Failed to update user");
     }
   }
 

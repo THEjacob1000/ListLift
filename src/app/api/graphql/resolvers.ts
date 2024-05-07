@@ -44,9 +44,9 @@ const resolvers: Resolvers = {
         );
       }
     },
-    updateTask: async (_, { id, input }, { dataSources }) => {
+    updateTask: async (_: any, { input }: any, context: any) => {
       try {
-        return await dataSources.tasks.updateTask(id, input);
+        return await context.dataSources.tasks.updateTask({ input });
       } catch (error) {
         throw new Error("Failed to update task");
       }
