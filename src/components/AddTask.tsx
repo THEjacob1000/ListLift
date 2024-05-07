@@ -47,6 +47,9 @@ import {
 import { cn } from "@/lib/utils";
 import { Calendar } from "./ui/calendar";
 import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { CREATE_TASK } from "@/app/constants";
+import { useToast } from "./ui/use-toast";
 
 enum Priority {
   LOW = "LOW",
@@ -71,6 +74,8 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [createTask] = useMutation(CREATE_TASK);
+  const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -84,8 +89,43 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
   });
   const title = form.watch("title");
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log("Form Submitted:", values);
+    const {
+      title,
+      description,
+      deadline,
+      priority,
+      category,
+      completed,
+    } = values || {};
+    try {
+      await createTask({
+        variables: {
+          input: {
+            title,
+            description,
+            deadline,
+            priority,
+            category,
+            completed,
+          },
+        },
+      });
+      form.reset();
+      setIsOpen(false);
+      toast({
+        title: "Task created",
+        description: "The task has been created successfully",
+        status: "success",
+      });
+    } catch (error: any) {
+      toast({
+        title: "An error occurred",
+        description: error.message,
+        status: "error",
+      });
+    }
   };
   const completedOptions = [
     { label: "Todo", value: false },

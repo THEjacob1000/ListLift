@@ -21,6 +21,7 @@ const typeDefs = `#graphql
     priority: Priority!
     deadline: String
     category: String
+    completed: Boolean
   }
 
   input UpdateTaskInput {

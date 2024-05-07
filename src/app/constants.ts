@@ -13,3 +13,16 @@ export const FETCH_TASKS = gql`
     }
   }
 `;
+
+export const CREATE_TASK = gql`
+  mutation createTask($input: NewTaskInput!) {
+    createTask(input: $input) {
+      title
+      description
+      priority
+      deadline
+      completed
+      category
+    }
+  }
+`;
