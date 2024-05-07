@@ -55,7 +55,9 @@ export function DataTable<TData extends Task, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([
+    { id: "completed", desc: false },
+  ]);
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
@@ -216,6 +218,10 @@ export function DataTable<TData extends Task, TValue>({
               const isGrouped = row.subRows && row.subRows.length > 0;
               const groupingColumnId = grouping[0] || "No Category";
               const groupId = row.original[groupingColumnId];
+              const isCompleted = row.original.completed;
+              const rowClass = isCompleted
+                ? "text-muted-foreground bg-black/20 line-through"
+                : "";
 
               if (isGrouped) {
                 const isCollapsed = collapsedGroups[groupId];
@@ -224,6 +230,7 @@ export function DataTable<TData extends Task, TValue>({
                     <TableRow
                       onClick={() => toggleGroup(groupId)}
                       style={{ cursor: "pointer" }}
+                      className={rowClass}
                     >
                       <TableCell colSpan={columns.length}>
                         <strong className="flex gap-2 items-center">
@@ -238,7 +245,14 @@ export function DataTable<TData extends Task, TValue>({
                     </TableRow>
                     {!isCollapsed &&
                       row.subRows.map((subRow) => (
-                        <TableRow key={subRow.id}>
+                        <TableRow
+                          key={subRow.id}
+                          className={
+                            subRow.original.completed
+                              ? "bg-muted text-muted-foreground line-through"
+                              : ""
+                          }
+                        >
                           {subRow.getVisibleCells().map((cell) => (
                             <TableCell key={cell.id}>
                               {flexRender(
@@ -253,7 +267,7 @@ export function DataTable<TData extends Task, TValue>({
                 );
               } else {
                 return (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id} className={rowClass}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(

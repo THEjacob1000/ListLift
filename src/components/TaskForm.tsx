@@ -504,7 +504,7 @@ const TaskForm = ({
                 Cancel
               </Button>
               <Button type="submit" disabled={title.length < 3}>
-                Add Task
+                {type === "new" ? "Add Task" : "Save Task"}
               </Button>
             </div>
           </div>
