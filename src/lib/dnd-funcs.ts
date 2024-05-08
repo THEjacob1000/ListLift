@@ -91,7 +91,6 @@ export const handleDragMove = (
   setContainers: (containers: DNDType[]) => void
 ) => {
   const { active, over } = event;
-
   // Handle Items Sorting
   if (
     active.id.toString().includes("item") &&
@@ -212,6 +211,7 @@ export const handleDragEnd = async (
 ) => {
   const { active, over } = event;
   if (!over) return;
+  console.log(over.id);
 
   // Handling the movement of containers themselves
   if (
@@ -240,8 +240,10 @@ export const handleDragEnd = async (
     "item",
     containers
   );
-  const overContainer = findValueOfItems(over.id, "item", containers);
-
+  const overContainer =
+    findValueOfItems(over.id, "item", containers) || over.id;
+  console.log("Active Container:", activeContainer);
+  console.log("Over Container:", overContainer);
   if (!activeContainer || !overContainer) return;
   const activeItem = activeContainer.items.find(
     (item: { id: UniqueIdentifier }) => item.id === active.id
@@ -272,15 +274,16 @@ export const handleDragEnd = async (
         overContainerTitle as string
       ).toUpperCase();
     } else {
-      updatedProperties.priority = "Other";
+      updatedProperties.priority = (over.id as string).toUpperCase();
     }
   } else if (grouping === "completed") {
     updatedProperties.completed = overContainerTitle === "Completed";
   }
+
+  console.log("Active Item:", activeItem);
   // Use the UPDATE_TASK mutation to update the task in the database
   try {
-    // console.log("Updating task:", activeItem.id, updatedProperties);
-
+    console.log("New Container:", overContainerTitle);
     await updateTask({
       variables: {
         input: {
@@ -306,7 +309,7 @@ export const handleDragEnd = async (
       (container) =>
         container.id ===
         (over.id.toString().includes("item")
-          ? overContainer.id
+          ? (overContainer as DNDType).id
           : over.id)
     );
 

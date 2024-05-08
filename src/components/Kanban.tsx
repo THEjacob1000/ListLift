@@ -42,6 +42,7 @@ import KanbanItem from "./KanbanItem";
 import { useMutation } from "@apollo/client";
 import { UPDATE_TASK } from "@/app/constants";
 import {
+  findItemTitle,
   handleDragEnd,
   handleDragMove,
   handleDragStart,
@@ -109,7 +110,6 @@ const Kanban = () => {
       return { "All Tasks": filteredData };
     }
 
-    const groupOrder = ["Low", "Medium", "High"];
     let intermediateGroupedTasks = filteredData.reduce(
       (acc: GroupedTasks, task: Task) => {
         let groupKey =
@@ -146,20 +146,50 @@ const Kanban = () => {
       },
       {}
     );
+    if (grouping === "priority") {
+      const groupOrder = ["Low", "Medium", "High"];
+      const sortedGroupedTasks: { [key: string]: Task[] } = {};
+      groupOrder.forEach((key) => {
+        if (intermediateGroupedTasks[key]) {
+          sortedGroupedTasks[key] =
+            intermediateGroupedTasks[key] || [];
+        }
+      });
 
-    // Sort keys according to the defined order
-    const sortedGroupedTasks: { [key: string]: Task[] } = {};
-    groupOrder.forEach((key) => {
-      if (intermediateGroupedTasks[key]) {
-        sortedGroupedTasks[key] = intermediateGroupedTasks[key];
-      }
-    });
-
-    return sortedGroupedTasks;
+      return sortedGroupedTasks;
+    } else if (grouping === "completed") {
+      const groupOrder = ["Not Completed", "Completed"];
+      const sortedGroupedTasks: { [key: string]: Task[] } = {};
+      groupOrder.forEach((key) => {
+        if (intermediateGroupedTasks[key]) {
+          sortedGroupedTasks[key] =
+            intermediateGroupedTasks[key] || [];
+        }
+      });
+      return sortedGroupedTasks;
+    }
+    return intermediateGroupedTasks;
   }, [data, grouping, filter]);
 
   useEffect(() => {
-    const newContainers = Object.entries(groupedData).map(
+    const defaultGroups: { [key: string]: Task[] } = {};
+    if (grouping === "priority") {
+      defaultGroups["Low"] = [];
+      defaultGroups["Medium"] = [];
+      defaultGroups["High"] = [];
+    } else if (grouping === "completed") {
+      defaultGroups["Not Completed"] = [];
+      defaultGroups["Completed"] = [];
+    }
+
+    const mergedGroupedTasks: { [key: string]: Task[] } = {
+      ...defaultGroups,
+    };
+    Object.keys(groupedData).forEach((key) => {
+      mergedGroupedTasks[key] = groupedData[key];
+    });
+
+    const newContainers = Object.entries(mergedGroupedTasks).map(
       ([groupName, tasks]) => ({
         id: groupName,
         title: groupName,
@@ -170,7 +200,7 @@ const Kanban = () => {
       })
     );
     setContainers(newContainers);
-  }, [groupedData]);
+  }, [groupedData, grouping]);
 
   useEffect(() => {
     const newIdToTitleMap: { [key: string]: string } = {};
@@ -262,25 +292,19 @@ const Kanban = () => {
                   id={container.id}
                   title={container.title}
                   key={container.id}
-                  onAddItem={() => {
-                    setShowAddItemModal(true);
-                    setCurrentContainerId(container.id);
-                  }}
-                >
-                  <SortableContext
-                    items={container.items.map((item) => item.id)}
-                  >
-                    {container.items.map((item) => (
-                      <KanbanItem
-                        key={item.id}
-                        id={item.id}
-                        title={item.title}
-                      />
-                    ))}
-                  </SortableContext>
-                </DragCard>
+                  isEmpty={container.items.length === 0}
+                  items={container.items}
+                />
               ))}
             </SortableContext>
+            <DragOverlay>
+              {activeId ? (
+                <KanbanItem
+                  id={activeId}
+                  title={findItemTitle(activeId, containers)}
+                />
+              ) : null}
+            </DragOverlay>
           </DndContext>
         </div>
       </div>

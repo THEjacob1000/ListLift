@@ -1,23 +1,28 @@
 import { cn } from "@/lib/utils";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { useSortable } from "@dnd-kit/sortable";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "./ui/button";
+import React from "react";
+import KanbanItem from "./KanbanItem";
 
 interface DragCardProps {
   id: UniqueIdentifier;
-  children: React.ReactNode;
   title?: string;
   description?: string;
-  onAddItem?: () => void;
+  isEmpty?: boolean;
+  items: {
+    id: UniqueIdentifier;
+    title: string;
+  }[];
 }
 
 const DragCard = ({
   id,
-  children,
   title,
   description,
-  onAddItem,
+  isEmpty,
+  items,
 }: DragCardProps) => {
   const {
     attributes,
@@ -32,6 +37,7 @@ const DragCard = ({
       type: "container",
     },
   });
+
   return (
     <div
       {...attributes}
@@ -39,9 +45,10 @@ const DragCard = ({
       style={{
         transition,
         transform: CSS.Translate.toString(transform),
+        minHeight: isEmpty ? "100px" : undefined,
       }}
       className={cn(
-        "w-full h-full p-4 bg-card rounded-xl flex flex-col gap-y-4",
+        "w-full h-full p-4 bg-card rounded-xl flex flex-col gap-y-4 border-border-1 border",
         isDragging && "opacity-50"
       )}
     >
@@ -59,11 +66,21 @@ const DragCard = ({
           Drag Handle
         </button>
       </div>
-
-      {children}
-      <Button variant="ghost" onClick={onAddItem}>
-        Add Item
-      </Button>
+      <SortableContext items={items.map((item) => item.id)}>
+        {items.length > 0 ? (
+          items.map((item) => (
+            <KanbanItem
+              key={item.id}
+              id={item.id}
+              title={item.title}
+            />
+          ))
+        ) : (
+          <div className="text-muted-foreground text-center border-border border p-2 rounded-xl">
+            Drop items here
+          </div>
+        )}
+      </SortableContext>
     </div>
   );
 };
