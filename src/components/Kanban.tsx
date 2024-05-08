@@ -104,23 +104,55 @@ const Kanban = () => {
       return { "All Tasks": filteredData };
     }
 
-    return filteredData.reduce((acc: GroupedTasks, task: Task) => {
-      let groupKey =
-        task[grouping] === undefined ? "Other" : task[grouping];
+    const groupOrder = ["Low", "Medium", "High"]; // Define custom order, including 'Other'
+    let intermediateGroupedTasks = filteredData.reduce(
+      (acc: GroupedTasks, task: Task) => {
+        let groupKey =
+          task[grouping] === undefined ? "Other" : task[grouping];
 
-      if (grouping === "completed" && typeof groupKey === "boolean") {
-        groupKey = groupKey ? "Completed" : "Not Completed";
-      } else if (typeof groupKey !== "string") {
-        groupKey = String(groupKey);
-      }
+        if (grouping === "priority") {
+          switch (groupKey) {
+            case "LOW":
+              groupKey = "Low";
+              break;
+            case "MEDIUM":
+              groupKey = "Medium";
+              break;
+            case "HIGH":
+              groupKey = "High";
+              break;
+            default:
+              groupKey = "Low";
+          }
+        } else if (
+          grouping === "completed" &&
+          typeof groupKey === "boolean"
+        ) {
+          groupKey = groupKey ? "Completed" : "Not Completed";
+        } else if (typeof groupKey !== "string") {
+          groupKey = String(groupKey);
+        }
 
-      if (!acc[groupKey]) {
-        acc[groupKey] = [];
+        if (!acc[groupKey]) {
+          acc[groupKey] = [];
+        }
+        acc[groupKey].push(task);
+        return acc;
+      },
+      {}
+    );
+
+    // Sort keys according to the defined order
+    const sortedGroupedTasks: { [key: string]: Task[] } = {};
+    groupOrder.forEach((key) => {
+      if (intermediateGroupedTasks[key]) {
+        sortedGroupedTasks[key] = intermediateGroupedTasks[key];
       }
-      acc[groupKey].push(task);
-      return acc;
-    }, {});
+    });
+
+    return sortedGroupedTasks;
   }, [data, grouping, filter]);
+
   useEffect(() => {
     const newContainers = Object.entries(groupedData).map(
       ([groupName, tasks]) => ({
@@ -134,6 +166,7 @@ const Kanban = () => {
     );
     setContainers(newContainers);
   }, [groupedData]);
+
   useEffect(() => {
     const newIdToTitleMap: { [key: string]: string } = {};
     containers.forEach((container) => {
