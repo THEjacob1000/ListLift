@@ -1,34 +1,28 @@
 import { cn } from "@/lib/utils";
 import { UniqueIdentifier } from "@dnd-kit/core";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "./ui/button";
 import React from "react";
 import KanbanItem from "./KanbanItem";
 import Heading from "./Heading";
+import { Task } from "@/lib/types";
 
 interface DragCardProps {
   id: UniqueIdentifier;
   title?: string;
-  description?: string;
   isEmpty?: boolean;
-  items: {
-    id: UniqueIdentifier;
-    title: string;
-  }[];
+  items: Task[];
 }
 
-const DragCard = ({
-  id,
-  title,
-  description,
-  isEmpty,
-  items,
-}: DragCardProps) => {
+const DragCard = ({ id, title, isEmpty, items }: DragCardProps) => {
   const {
     attributes,
     setNodeRef,
-    listeners,
     transform,
     transition,
     isDragging,
@@ -56,17 +50,14 @@ const DragCard = ({
       <Heading as="h4" size="sm" className="mx-6">
         {title}
       </Heading>
-      <SortableContext items={items.map((item) => item.id)}>
-        {items.length > 0 ? (
-          items.map((item) => (
-            <KanbanItem key={item.id} id={item.id} />
-          ))
-        ) : (
-          <div className="text-muted-foreground text-center border-border border p-2 rounded-xl">
-            Drop items here
-          </div>
-        )}
-      </SortableContext>
+
+      {items.length > 0 ? (
+        items.map((item) => <KanbanItem key={item.id} id={item.id} />)
+      ) : (
+        <div className="text-muted-foreground text-center border-border border p-2 rounded-xl">
+          Drop items here
+        </div>
+      )}
     </div>
   );
 };

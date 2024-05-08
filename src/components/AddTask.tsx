@@ -36,7 +36,6 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Form Submitted:", values);
     const {
       title,
       description,
@@ -79,13 +78,11 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
       toast({
         title: "Task created",
         description: "The task has been created successfully",
-        status: "success",
       });
     } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message,
-        status: "error",
       });
     }
   };

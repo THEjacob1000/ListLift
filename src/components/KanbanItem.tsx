@@ -39,11 +39,7 @@ const KanbanItem = ({ id }: KanbanItemProps) => {
     },
   });
   const [data, setData] = useState<Task>();
-  const {
-    loading,
-    data: queryData,
-    refetch,
-  } = useQuery(FIND_TASK, {
+  const { loading, data: queryData } = useQuery(FIND_TASK, {
     variables: { getTaskId: id },
     onError: (error) => {
       console.error("Error fetching task:", error);

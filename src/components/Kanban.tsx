@@ -1,6 +1,6 @@
 "use client";
 
-import { Task } from "@/lib/types";
+import { DNDType, Task } from "@/lib/types";
 import { useEffect, useMemo, useState } from "react";
 import {
   DropdownMenu,
@@ -27,7 +27,9 @@ import {
   KeyboardSensor,
   PointerSensor,
   UniqueIdentifier,
+  closestCenter,
   closestCorners,
+  rectIntersection,
   useDroppable,
   useSensor,
   useSensors,
@@ -51,15 +53,6 @@ import {
 interface GroupedTasks {
   [key: string]: Task[];
 }
-
-type DNDType = {
-  id: UniqueIdentifier;
-  title: string;
-  items: {
-    id: UniqueIdentifier;
-    title: string;
-  }[];
-};
 
 const Kanban = () => {
   const [data, setData] = useState<Task[]>([]);
@@ -193,10 +186,7 @@ const Kanban = () => {
       ([groupName, tasks]) => ({
         id: groupName,
         title: groupName,
-        items: tasks.map((task) => ({
-          id: task.id,
-          title: task.title,
-        })),
+        items: tasks, // Directly using the array of Task objects
       })
     );
     setContainers(newContainers);
@@ -213,7 +203,9 @@ const Kanban = () => {
     groupOptions.find((opt) => opt.id === grouping)?.name || "None";
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { delay: 50, tolerance: 10 },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -265,14 +257,14 @@ const Kanban = () => {
         <div className="grid grid-cols-3 gap-6">
           <DndContext
             sensors={sensors}
-            collisionDetection={closestCorners}
+            collisionDetection={closestCenter}
             onDragStart={(event: DragStartEvent) =>
               handleDragStart(event, setActiveId)
             }
             onDragMove={(event: DragMoveEvent) =>
               handleDragMove(event, containers, setContainers)
             }
-            onDragEnd={(event: DragMoveEvent) =>
+            onDragEnd={(event: DragEndEvent) => {
               handleDragEnd(
                 event,
                 containers,
@@ -281,8 +273,8 @@ const Kanban = () => {
                 grouping,
                 updateTask,
                 setActiveId
-              )
-            }
+              );
+            }}
           >
             <SortableContext
               items={containers.map((container) => container.id)}

@@ -17,20 +17,12 @@ import {
   arrayMove,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { Task } from "./types";
+import { DNDType, Task } from "./types";
 import { useMutation } from "@apollo/client";
 
 interface GroupedTasks {
   [key: string]: Task[];
 }
-type DNDType = {
-  id: UniqueIdentifier;
-  title: string;
-  items: {
-    id: UniqueIdentifier;
-    title: string;
-  }[];
-};
 
 export const findItemTitle = (
   id: UniqueIdentifier | undefined,
@@ -38,9 +30,7 @@ export const findItemTitle = (
 ) => {
   const container = findValueOfItems(id, "item", containers);
   if (!container) return "";
-  const item = container.items.find(
-    (item: { id: UniqueIdentifier | undefined }) => item.id === id
-  );
+  const item = container.items.find((item: Task) => item.id === id);
   if (!item) return "";
   return item.title;
 };
@@ -212,7 +202,6 @@ export const handleDragEnd = async (
 ) => {
   const { active, over } = event;
   if (!over) return;
-
   // Handling the movement of containers themselves
   if (
     active.id.toString().includes("container") &&
@@ -244,7 +233,7 @@ export const handleDragEnd = async (
     findValueOfItems(over.id, "item", containers) || over.id;
   if (!activeContainer || !overContainer) return;
   const activeItem = activeContainer.items.find(
-    (item: { id: UniqueIdentifier }) => item.id === active.id
+    (item: Task) => item.id === active.id
   );
   const overContainerTitle = findContainerFromItem(
     over.id as string,
@@ -280,6 +269,7 @@ export const handleDragEnd = async (
 
   // Use the UPDATE_TASK mutation to update the task in the database
   try {
+    console.log("Updating task:", updatedProperties);
     await updateTask({
       variables: {
         input: {

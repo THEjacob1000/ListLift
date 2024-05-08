@@ -105,7 +105,6 @@ const EditTask = ({ id, children }: EditTaskProps) => {
   if (loading || loading2) return null;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Form Submitted:", values);
     const {
       title,
       description,
@@ -143,7 +142,6 @@ const EditTask = ({ id, children }: EditTaskProps) => {
   };
 
   const onDelete = async () => {
-    console.log("Attempting to delete the task");
     try {
       const response = await deleteTask({ variables: { id: id } });
       if (response.data.deleteTask.success) {
@@ -166,10 +164,9 @@ const EditTask = ({ id, children }: EditTaskProps) => {
   };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden">
+      <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden focus:border-none active:border-none focus:outline-none border-none outline-none focus-visible:ring-transparent">
         {children}
       </DialogTrigger>
-
       <TaskForm
         categories={categories}
         form={form}
