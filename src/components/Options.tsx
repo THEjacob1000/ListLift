@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TaskTable from "./TaskTable";
+import Kanban from "./Kanban";
 
 const Options = () => {
   const [activeView, setActiveView] = useState<"list" | "kanban">(
@@ -83,7 +84,7 @@ const Options = () => {
           </div>
         </div>
       </div>
-      <TaskTable />
+      {activeView === "list" ? <TaskTable /> : <Kanban />}
     </div>
   );
 };

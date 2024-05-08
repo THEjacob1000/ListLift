@@ -133,13 +133,11 @@ const EditTask = ({ id, title }: EditTaskProps) => {
       toast({
         title: "Task updated",
         description: "The task has been updated successfully",
-        status: "success",
       });
     } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message,
-        status: "error",
       });
     }
   };
@@ -152,20 +150,17 @@ const EditTask = ({ id, title }: EditTaskProps) => {
         toast({
           title: "Task deleted",
           description: "The task has been deleted successfully",
-          status: "success",
         });
       } else {
         toast({
           title: "Error",
           description: "Task could not be deleted",
-          status: "error",
         });
       }
     } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message,
-        status: "error",
       });
     }
   };

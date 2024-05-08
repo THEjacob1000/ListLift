@@ -46,6 +46,7 @@ const resolvers: Resolvers = {
     },
     updateTask: async (_: any, { input }: any, context: any) => {
       try {
+        console.log("Received input for update:", input);
         return await context.dataSources.tasks.updateTask({ input });
       } catch (error) {
         throw new Error("Failed to update task");
