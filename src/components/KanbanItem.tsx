@@ -39,12 +39,27 @@ const KanbanItem = ({ id }: KanbanItemProps) => {
     },
   });
   const [data, setData] = useState<Task>();
-  const { loading, data: queryData } = useQuery(FIND_TASK, {
+  const {
+    loading,
+    data: queryData,
+    refetch,
+  } = useQuery(FIND_TASK, {
     variables: { getTaskId: id },
     onError: (error) => {
       console.error("Error fetching task:", error);
     },
   });
+
+  useEffect(() => {
+    // Refetch the data every 5 seconds
+    const intervalId = setInterval(() => {
+      refetch();
+    }, 1000);
+
+    // Cleanup the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [refetch]);
+
   useEffect(() => {
     if (!loading && queryData) {
       const task = queryData.getTask as Task;
