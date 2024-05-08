@@ -60,7 +60,6 @@ const DeleteCompleted = () => {
         toast({
           title: "Error",
           description: `Failed to delete task: ${task.title}`,
-          status: "error",
         });
         break;
       }
@@ -69,7 +68,6 @@ const DeleteCompleted = () => {
     toast({
       title: "Deletion Complete",
       description: "All completed tasks have been deleted.",
-      status: "success",
     });
   };
   return (

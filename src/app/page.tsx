@@ -1,5 +1,6 @@
 import Heading from "@/components/Heading";
 import Options from "@/components/Options";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -8,7 +9,9 @@ export default function Home() {
         ListLift
       </Heading>
       <div className="bg-background pt-6">
-        <Options />
+        <Suspense>
+          <Options />
+        </Suspense>
       </div>
     </div>
   );
