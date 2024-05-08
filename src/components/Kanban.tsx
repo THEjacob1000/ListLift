@@ -298,12 +298,7 @@ const Kanban = () => {
               ))}
             </SortableContext>
             <DragOverlay>
-              {activeId ? (
-                <KanbanItem
-                  id={activeId}
-                  title={findItemTitle(activeId, containers)}
-                />
-              ) : null}
+              {activeId ? <KanbanItem id={activeId} /> : null}
             </DragOverlay>
           </DndContext>
         </div>

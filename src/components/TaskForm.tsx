@@ -237,13 +237,9 @@ const TaskForm = ({
                           className="flex gap-2 px-6 justify-start w-32"
                         >
                           <Flag
-                            color={
-                              field.value === "LOW"
-                                ? "#808080"
-                                : field.value === "MEDIUM"
-                                ? "#FFFF00"
-                                : "#FF0000"
-                            }
+                            color={getPriorityColor(
+                              field.value as Priority
+                            )}
                             size={20}
                           />
                           {field.value

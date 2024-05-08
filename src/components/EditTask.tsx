@@ -17,13 +17,13 @@ import { Dialog, DialogTrigger } from "./ui/dialog";
 
 interface EditTaskProps {
   id: string;
-  title: string;
+  children: React.ReactNode;
 }
 interface TasksData {
   getAllTasks: Task[];
 }
 
-const EditTask = ({ id, title }: EditTaskProps) => {
+const EditTask = ({ id, children }: EditTaskProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<Task>();
   const [categories, setCategories] = useState<string[]>([]);
@@ -167,9 +167,7 @@ const EditTask = ({ id, title }: EditTaskProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden">
-        <span className="flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
-          {data?.title || "No Title"}
-        </span>
+        {children}
       </DialogTrigger>
 
       <TaskForm

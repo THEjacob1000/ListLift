@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "./ui/button";
 import React from "react";
 import KanbanItem from "./KanbanItem";
+import Heading from "./Heading";
 
 interface DragCardProps {
   id: UniqueIdentifier;
@@ -52,28 +53,13 @@ const DragCard = ({
         isDragging && "opacity-50"
       )}
     >
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-y-1">
-          <h1 className="text-xl text-card-foreground">{title}</h1>
-          <p className="text-muted-foreground text-sm">
-            {description}
-          </p>
-        </div>
-        <button
-          className="border p-2 text-xs rounded-xl shadow-lg hover:shadow-xl"
-          {...listeners}
-        >
-          Drag Handle
-        </button>
-      </div>
+      <Heading as="h4" size="sm" className="mx-6">
+        {title}
+      </Heading>
       <SortableContext items={items.map((item) => item.id)}>
         {items.length > 0 ? (
           items.map((item) => (
-            <KanbanItem
-              key={item.id}
-              id={item.id}
-              title={item.title}
-            />
+            <KanbanItem key={item.id} id={item.id} />
           ))
         ) : (
           <div className="text-muted-foreground text-center border-border border p-2 rounded-xl">
