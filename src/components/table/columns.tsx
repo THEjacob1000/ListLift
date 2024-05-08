@@ -26,7 +26,11 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-left ml-4">
-        <EditTask id={row.original.id} title={row.original.title} />
+        <EditTask id={row.original.id}>
+          <span className="flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
+            {row.original.title || "No Title"}
+          </span>
+        </EditTask>
       </div>
     ),
   },

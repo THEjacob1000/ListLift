@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Heading from "./Heading";
 import { Button } from "./ui/button";
 import {
@@ -10,14 +10,43 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TaskTable from "./TaskTable";
+import Kanban from "./Kanban";
+import {
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 
 const Options = () => {
+  const searchParams = useSearchParams();
   const [activeView, setActiveView] = useState<"list" | "kanban">(
-    "list"
+    searchParams.get("activeView") === "kanban" ? "kanban" : "list"
   );
   const [viewType, setViewType] = useState<"projects" | "tasks">(
-    "tasks"
+    searchParams.get("viewType") === "projects" ? "projects" : "tasks"
   );
+  const router = useRouter();
+  const pathName = usePathname();
+
+  useEffect(() => {
+    if (pathName === "/") {
+      router.push(`?activeView=${activeView}&viewType=${viewType}`);
+    } else {
+      router.replace(
+        `?activeView=${activeView}&viewType=${viewType}`
+      );
+    }
+  }, [activeView, pathName, router, viewType]);
+  useEffect(() => {
+    const view = searchParams.get("view");
+    const active = searchParams.get("active");
+    if (view) {
+      setViewType(view as "projects" | "tasks");
+    }
+    if (active) {
+      setActiveView(active as "list" | "kanban");
+    }
+  }, [searchParams]);
   return (
     <div className="mx-12 flex flex-col">
       <div className="flex justify-between items-center">
@@ -83,7 +112,7 @@ const Options = () => {
           </div>
         </div>
       </div>
-      <TaskTable />
+      {activeView === "list" ? <TaskTable /> : <Kanban />}
     </div>
   );
 };

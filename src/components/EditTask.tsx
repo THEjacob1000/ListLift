@@ -17,13 +17,13 @@ import { Dialog, DialogTrigger } from "./ui/dialog";
 
 interface EditTaskProps {
   id: string;
-  title: string;
+  children: React.ReactNode;
 }
 interface TasksData {
   getAllTasks: Task[];
 }
 
-const EditTask = ({ id, title }: EditTaskProps) => {
+const EditTask = ({ id, children }: EditTaskProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<Task>();
   const [categories, setCategories] = useState<string[]>([]);
@@ -105,7 +105,6 @@ const EditTask = ({ id, title }: EditTaskProps) => {
   if (loading || loading2) return null;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log("Form Submitted:", values);
     const {
       title,
       description,
@@ -133,50 +132,41 @@ const EditTask = ({ id, title }: EditTaskProps) => {
       toast({
         title: "Task updated",
         description: "The task has been updated successfully",
-        status: "success",
       });
     } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message,
-        status: "error",
       });
     }
   };
 
   const onDelete = async () => {
-    console.log("Attempting to delete the task");
     try {
       const response = await deleteTask({ variables: { id: id } });
       if (response.data.deleteTask.success) {
         toast({
           title: "Task deleted",
           description: "The task has been deleted successfully",
-          status: "success",
         });
       } else {
         toast({
           title: "Error",
           description: "Task could not be deleted",
-          status: "error",
         });
       }
     } catch (error: any) {
       toast({
         title: "An error occurred",
         description: error.message,
-        status: "error",
       });
     }
   };
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden">
-        <span className="flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
-          {data?.title || "No Title"}
-        </span>
+      <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden focus:border-none active:border-none focus:outline-none border-none outline-none focus-visible:ring-transparent">
+        {children}
       </DialogTrigger>
-
       <TaskForm
         categories={categories}
         form={form}

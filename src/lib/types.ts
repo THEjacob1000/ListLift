@@ -1,3 +1,4 @@
+import { UniqueIdentifier } from "@dnd-kit/core";
 import { z } from "zod";
 
 export type Task = {
@@ -19,3 +20,9 @@ export const formSchema = z.object({
   category: z.string().optional(),
   completed: z.boolean().optional(),
 });
+
+export type DNDType = {
+  id: UniqueIdentifier;
+  title: string;
+  items: Task[];
+};
