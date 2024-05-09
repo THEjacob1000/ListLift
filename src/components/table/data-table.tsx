@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-
 import {
   ColumnDef,
   flexRender,
@@ -16,7 +15,6 @@ import {
   VisibilityState,
   useReactTable,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -28,11 +26,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -40,7 +33,6 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Boxes, ChevronDown, ChevronUp } from "lucide-react";
 import { capitalize, isTask } from "@/lib/utils";
 import { Task, Project } from "@/lib/types";
@@ -70,7 +62,10 @@ export function DataTable({
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+    React.useState<VisibilityState>({
+      priority: type === "project" ? false : true,
+      category: type === "project" ? false : true,
+    });
   const [grouping, setGrouping] = React.useState<GroupingState>([]);
   const [statusView, setStatusView] = React.useState<Status[]>([
     "TODO",
@@ -80,6 +75,7 @@ export function DataTable({
   const [collapsedGroups, setCollapsedGroups] = React.useState<{
     [key: string]: boolean;
   }>({});
+
   const toggleGroup = (groupId: string | number) => {
     setCollapsedGroups((prev: { [key: string]: boolean }) => ({
       ...prev,
@@ -87,6 +83,19 @@ export function DataTable({
     }));
   };
 
+  React.useEffect(() => {
+    if (type === "project") {
+      setColumnVisibility({
+        priority: false,
+        category: false,
+      });
+    } else {
+      setColumnVisibility({
+        priority: true,
+        category: true,
+      });
+    }
+  }, [type]);
   const table = useReactTable({
     data: type === "task" ? tasks : projects,
     columns,
@@ -98,7 +107,6 @@ export function DataTable({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     getGroupedRowModel: getGroupedRowModel(),
-
     state: {
       sorting,
       columnFilters,
@@ -106,10 +114,12 @@ export function DataTable({
       grouping,
     },
   });
+
   const groupOptions = [
     { id: "category", name: "Category" },
     { id: "priority", name: "Priority" },
   ];
+
   const categoryNames = Array.from(
     new Set(
       tasks
@@ -117,20 +127,13 @@ export function DataTable({
         .filter((category): category is string => !!category)
     )
   );
+
   const statusOptions = [
-    {
-      id: "TODO",
-      name: "To do",
-    },
-    {
-      id: "IN_PROGRESS",
-      name: "In Progress",
-    },
-    {
-      id: "DONE",
-      name: "Completed",
-    },
+    { id: "TODO", name: "To do" },
+    { id: "IN_PROGRESS", name: "In Progress" },
+    { id: "DONE", name: "Completed" },
   ];
+
   const changeStatusView = (checked: boolean, status: Status) => {
     const column = table.getColumn("status");
     if (column) {
@@ -143,6 +146,7 @@ export function DataTable({
       }
     }
   };
+
   return (
     <div className="mt-6">
       <div className="flex items-center w-full justify-between py-4">
@@ -161,48 +165,51 @@ export function DataTable({
             }
             className="max-w-sm"
           />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant={grouping.length > 0 ? "default" : "outline"}
-                className="ml-auto"
-              >
-                <Boxes size={16} className="mr-2" />
-                Group By:{" "}
-                {grouping.length ? capitalize(grouping[0]) : "None"}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuRadioGroup
-                value={grouping[0]}
-                onValueChange={(value) => {
-                  setGrouping(value ? [value] : []);
-                  const newVisibility: VisibilityState = {};
-                  table.getAllColumns().forEach((column) => {
-                    newVisibility[column.id] = true;
-                  });
-                  if (value) {
-                    newVisibility[value] = false;
+          {type === "task" && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant={
+                    grouping.length > 0 ? "default" : "outline"
                   }
-                  table.setColumnVisibility(newVisibility);
-                }}
-              >
-                {groupOptions.map((option) => (
-                  <DropdownMenuRadioItem
-                    key={option.id}
-                    value={option.id}
-                    className="pr-20"
-                  >
-                    {option.name}
+                  className="ml-auto"
+                >
+                  <Boxes size={16} className="mr-2" />
+                  Group By:{" "}
+                  {grouping.length ? capitalize(grouping[0]) : "None"}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuRadioGroup
+                  value={grouping[0]}
+                  onValueChange={(value) => {
+                    setGrouping(value ? [value] : []);
+                    const newVisibility: VisibilityState = {};
+                    table.getAllColumns().forEach((column) => {
+                      newVisibility[column.id] = true;
+                    });
+                    if (value) {
+                      newVisibility[value] = false;
+                    }
+                    table.setColumnVisibility(newVisibility);
+                  }}
+                >
+                  {groupOptions.map((option) => (
+                    <DropdownMenuRadioItem
+                      key={option.id}
+                      value={option.id}
+                      className="pr-20"
+                    >
+                      {option.name}
+                    </DropdownMenuRadioItem>
+                  ))}
+                  <DropdownMenuRadioItem value="" className="pr-20">
+                    None
                   </DropdownMenuRadioItem>
-                ))}
-                <DropdownMenuRadioItem value="" className="pr-20">
-                  None
-                </DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">

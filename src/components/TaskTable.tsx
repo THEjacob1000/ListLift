@@ -27,6 +27,7 @@ const TaskTable = ({ type }: TaskTableProps) => {
       setProjects(projects);
     }
   }, [loading2, queryData2]);
+
   return (
     <DataTable
       columns={columns}

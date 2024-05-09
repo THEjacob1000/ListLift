@@ -1,23 +1,69 @@
 import { Project, Task } from "@/lib/types";
-import { isTask } from "@/lib/utils";
+import { capitalize, isTask } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
 import EditTask from "../TaskEdit";
+import EditProject from "../ProjectEdit";
 import TaskCheckbox from "../TaskCheckbox";
 import ProjectCheckbox from "../ProjectCheckbox";
+import {
+  CalendarIcon,
+  Circle,
+  CircleCheckBig,
+  Flag,
+  X,
+  Plus,
+} from "lucide-react";
+
+enum Priority {
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+}
+
+const priorityIcons = {
+  LOW: <Flag size={16} color="#808080" fill="#808080" />,
+  MEDIUM: <Flag size={16} color="#FFFF00" fill="#FFFF00" />,
+  HIGH: <Flag size={16} color="#FF0000" fill="#FF0000" />,
+};
+
+enum Status {
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  DONE = "DONE",
+}
+
+const statusIcons = {
+  TODO: <Circle size={16} />,
+  IN_PROGRESS: <Circle size={16} color="#FFAE42" fill="#FFAE42" />,
+  DONE: <CircleCheckBig color="#00FF00" size={16} />,
+};
+
+const editWrapper = (
+  element: Task | Project,
+  children: React.ReactNode
+) => {
+  return isTask(element) ? (
+    <EditTask id={element.id}>{children}</EditTask>
+  ) : (
+    <EditProject id={element.id}>{children}</EditProject>
+  );
+};
 
 export const columns: ColumnDef<Task | Project>[] = [
   {
     accessorKey: "checkbox",
     header: () => <div className="sr-only">Checkbox</div>,
-    cell: ({ row }) => {
-      isTask(row.original) ? (
-        <TaskCheckbox id={row.original.id} />
-      ) : (
-        <ProjectCheckbox id={row.original.id} />
-      );
-    },
+    cell: ({ row }) =>
+      editWrapper(
+        row.original,
+        isTask(row.original) ? (
+          <TaskCheckbox id={row.original.id} />
+        ) : (
+          <ProjectCheckbox id={row.original.id} />
+        )
+      ),
   },
   {
     accessorKey: "title",
@@ -32,17 +78,15 @@ export const columns: ColumnDef<Task | Project>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="text-left ml-4">
-        <EditTask id={row.original.id}>
-          <span className="flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
-            {isTask(row.original)
-              ? row.original.title
-              : row.original.name}
-          </span>
-        </EditTask>
-      </div>
-    ),
+    cell: ({ row }) =>
+      editWrapper(
+        row.original,
+        <span className="flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
+          {isTask(row.original)
+            ? row.original.title
+            : row.original.name}
+        </span>
+      ),
   },
   {
     accessorKey: "description",
@@ -57,11 +101,13 @@ export const columns: ColumnDef<Task | Project>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ getValue }) => (
-      <div className="text-left ml-4">
-        {getValue() as React.ReactNode}
-      </div>
-    ),
+    cell: ({ row, getValue }) =>
+      editWrapper(
+        row.original,
+        <div className="text-left ml-4">
+          {getValue() as React.ReactNode}
+        </div>
+      ),
   },
   {
     accessorKey: "priority",
@@ -76,11 +122,14 @@ export const columns: ColumnDef<Task | Project>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ getValue }) => (
-      <div className="text-left ml-4 font-medium">
-        {getValue() as React.ReactNode}
-      </div>
-    ),
+    cell: ({ row, getValue }) =>
+      editWrapper(
+        row.original,
+        <div className="text-left ml-4 font-medium flex items-center gap-2">
+          {priorityIcons[getValue() as Priority]}
+          {capitalize(getValue() as string)}
+        </div>
+      ),
   },
   {
     accessorKey: "deadline",
@@ -95,18 +144,26 @@ export const columns: ColumnDef<Task | Project>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ getValue }) => {
-      if (!getValue()) return null;
-      const deadline = new Date(getValue() as string);
-      const formatted = deadline.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-      return (
-        <div className="text-left ml-4 font-medium">{formatted}</div>
-      );
-    },
+    cell: ({ row, getValue }) =>
+      editWrapper(
+        row.original,
+        getValue() ? (
+          <div className="text-left ml-4 font-medium">
+            {new Date(getValue() as string).toLocaleDateString(
+              "en-US",
+              {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              }
+            )}
+          </div>
+        ) : (
+          <div className="text-left ml-4 font-medium">
+            No deadline
+          </div>
+        )
+      ),
   },
   {
     accessorKey: "status",
@@ -121,25 +178,26 @@ export const columns: ColumnDef<Task | Project>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-    cell: ({ getValue }) => (
-      <div className="text-left ml-4">
-        {(() => {
-          switch (getValue() as React.ReactNode) {
-            case "TODO":
-              return "To Do";
-            case "IN_PROGRESS":
-              return "In Progress";
-            case "DONE":
-              return "Completed";
-            default:
-              return "";
-          }
-        })()}
-      </div>
-    ),
+    filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    cell: ({ row, getValue }) =>
+      editWrapper(
+        row.original,
+        <div className="text-left ml-4 flex items-center gap-2">
+          {statusIcons[getValue() as Status]}
+          {(() => {
+            switch (getValue() as string) {
+              case "TODO":
+                return "To Do";
+              case "IN_PROGRESS":
+                return "In Progress";
+              case "DONE":
+                return "Completed";
+              default:
+                return "";
+            }
+          })()}
+        </div>
+      ),
   },
   {
     accessorKey: "category",
@@ -154,10 +212,12 @@ export const columns: ColumnDef<Task | Project>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ getValue }) => (
-      <div className="text-left ml-4">
-        {getValue() as React.ReactNode}
-      </div>
-    ),
+    cell: ({ row, getValue }) =>
+      editWrapper(
+        row.original,
+        <div className="text-left ml-4">
+          {getValue() as React.ReactNode}
+        </div>
+      ),
   },
 ];

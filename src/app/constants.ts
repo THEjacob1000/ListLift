@@ -23,6 +23,7 @@ export const FETCH_PROJECTS = gql`
     getAllProjects {
       name
       description
+      id
       tasks {
         id
         title
@@ -61,7 +62,15 @@ export const FIND_PROJECT = gql`
       name
       description
       deadline
-      tasks
+      tasks {
+        id
+        title
+        description
+        priority
+        deadline
+        status
+        category
+      }
     }
   }
 `;

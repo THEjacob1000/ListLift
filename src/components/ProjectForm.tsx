@@ -29,7 +29,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "./ui/popover";
-import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "./ui/calendar";
 import { projectSchema } from "@/lib/types";
@@ -40,7 +39,7 @@ enum Priority {
   HIGH = "HIGH",
 }
 
-interface TaskFormProps {
+interface ProjectFormProps {
   form: UseFormReturn<
     {
       name: string;
@@ -59,35 +58,18 @@ interface TaskFormProps {
   onDelete?: () => void;
 }
 
-const TaskForm = ({
+const ProjectForm = ({
   form,
   onSubmit,
   setIsOpen,
   type,
   onDelete,
-}: TaskFormProps) => {
+}: ProjectFormProps) => {
   const completedOptions = [
     { label: "Todo", value: "TODO" },
     { label: "In Progress", value: "IN_PROGRESS" },
     { label: "Completed", value: "DONE" },
   ];
-  const priorityOptions = [
-    { label: "Low", value: "LOW" },
-    { label: "Medium", value: "MEDIUM" },
-    { label: "High", value: "HIGH" },
-  ];
-  const getPriorityColor = (priority: Priority): string => {
-    switch (priority) {
-      case Priority.LOW:
-        return "#808080";
-      case Priority.MEDIUM:
-        return "#FFFF00";
-      case Priority.HIGH:
-        return "#FF0000";
-      default:
-        return "#000000";
-    }
-  };
   const name = form.watch("name");
   const handleDatePreset = (days: number) => {
     const newDate = addDays(new Date(), days);
@@ -119,7 +101,7 @@ const TaskForm = ({
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="Task name"
+                      placeholder="Project name"
                       className="w-full p-2 bg-card focus:border-none active:border-none focus:outline-none border-none outline-none text-xl focus-visible:ring-transparent"
                       {...field}
                     />
@@ -148,7 +130,7 @@ const TaskForm = ({
             orientation="vertical"
             className="col-span-1 ml-4"
           />
-          <div className="col-span-3 flex items-start justify-start flex-col gap-4 p-4">
+          <div className="col-span-3 flex items-start justify-start flex-col gap-4 pt-4 xl:p-4 w-full">
             <span className="col-span-2 flex justify-start font-semibold">
               Details
             </span>
@@ -319,7 +301,7 @@ const TaskForm = ({
                 Cancel
               </Button>
               <Button type="submit" disabled={name.length < 3}>
-                {type === "new" ? "Add Task" : "Save Task"}
+                {type === "new" ? "Add Project" : "Save Project"}
               </Button>
             </div>
           </div>
@@ -329,4 +311,4 @@ const TaskForm = ({
   );
 };
 
-export default TaskForm;
+export default ProjectForm;
