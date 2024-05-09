@@ -16,6 +16,10 @@ const taskSchema = new Schema({
     enum: ["TODO", "IN_PROGRESS", "DONE"],
   },
   category: { type: String, required: false },
+  project: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project",
+  },
 });
 
 export default mongoose.models.Task ||

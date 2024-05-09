@@ -3,8 +3,8 @@ import { ApolloServer } from "@apollo/server";
 import { NextRequest } from "next/server";
 import typeDefs from "./schema";
 import resolvers from "./resolvers";
-import Tasks from "./datasources";
-import TaskModel from "./models";
+import { Tasks } from "./datasources";
+import TaskModel from "./models/task";
 import mongoose from "mongoose";
 
 const uri = process.env.MONGODB_URI;
