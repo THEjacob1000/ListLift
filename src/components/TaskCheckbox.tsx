@@ -31,20 +31,21 @@ const TaskCheckbox = ({ id }: TaskCheckboxProps) => {
   }, [id, loading, queryData]);
   if (!data) return null;
   const handleCheckedChange = async () => {
-    const newCompletedStatus = !data?.completed;
+    const newCompletedStatus =
+      data?.status === "DONE" ? "TODO" : "DONE";
     try {
       await updateTask({
         variables: {
           input: {
             id: id,
-            completed: newCompletedStatus,
+            status: newCompletedStatus,
           },
         },
         optimisticResponse: {
           updateTask: {
             __typename: "Task",
             id: id,
-            completed: newCompletedStatus,
+            status: newCompletedStatus,
             title: data?.title,
             description: data?.description,
             priority: data?.priority,
@@ -54,7 +55,7 @@ const TaskCheckbox = ({ id }: TaskCheckboxProps) => {
         },
       });
       setData((prev) =>
-        prev ? { ...prev, completed: newCompletedStatus } : undefined
+        prev ? { ...prev, status: newCompletedStatus } : undefined
       );
     } catch (error: any) {
       console.error("Error updating task:", error.message);
@@ -62,7 +63,7 @@ const TaskCheckbox = ({ id }: TaskCheckboxProps) => {
   };
   return (
     <Checkbox
-      checked={data?.completed}
+      checked={data?.status === "DONE"}
       onCheckedChange={handleCheckedChange}
     />
   );

@@ -5,7 +5,7 @@ const typeDefs = `#graphql
     description: String
     priority: Priority!
     deadline: String
-    completed: Boolean!
+    status: Status!
     category: String
   }
 
@@ -15,13 +15,19 @@ const typeDefs = `#graphql
     HIGH
   }
 
+  enum Status {
+    TODO
+    IN_PROGRESS
+    DONE
+  }
+
   input NewTaskInput {
     title: String!
     description: String
     priority: Priority!
     deadline: String
     category: String
-    completed: Boolean
+    status: Status
   }
 
   input UpdateTaskInput {
@@ -30,7 +36,7 @@ const typeDefs = `#graphql
     description: String
     priority: Priority
     deadline: String
-    completed: Boolean
+    status: Status
     category: String
   }
 
@@ -42,7 +48,7 @@ const typeDefs = `#graphql
   input TaskFilterInput {
     priority: Priority
     deadline: String
-    completed: Boolean
+    status: Status
     category: String
   }
   type DeleteTaskResult {

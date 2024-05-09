@@ -10,10 +10,10 @@ const taskSchema = new Schema({
     enum: ["LOW", "MEDIUM", "HIGH"],
   },
   deadline: { type: String, required: false },
-  completed: {
-    type: Boolean,
-    required: [true, "Completed status is required"],
-    default: false,
+  status: {
+    type: String,
+    required: [true, "Status is required"],
+    enum: ["TODO", "IN_PROGRESS", "DONE"],
   },
   category: { type: String, required: false },
 });

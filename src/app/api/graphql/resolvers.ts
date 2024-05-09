@@ -6,7 +6,7 @@ interface Task {
   description?: string;
   priority: Priority;
   deadline?: string;
-  completed: boolean;
+  status: Status;
   category?: string;
 }
 
@@ -14,6 +14,12 @@ enum Priority {
   LOW = "LOW",
   MEDIUM = "MEDIUM",
   HIGH = "HIGH",
+}
+
+enum Status {
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  DONE = "DONE",
 }
 
 const resolvers: Resolvers = {
@@ -40,7 +46,9 @@ const resolvers: Resolvers = {
       } catch (error: any) {
         console.error("Detailed error: ", error);
         throw new Error(
-          `Failed to create task: ${error.message || error}`
+          `Failed to create task (resolver): ${
+            error.message || error
+          }`
         );
       }
     },

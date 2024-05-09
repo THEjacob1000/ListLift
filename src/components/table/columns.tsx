@@ -99,7 +99,7 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "completed",
+    accessorKey: "status",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -107,13 +107,24 @@ export const columns: ColumnDef<Task>[] = [
           column.toggleSorting(column.getIsSorted() === "asc")
         }
       >
-        Completed
+        Status
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
     cell: ({ getValue }) => (
       <div className="text-left ml-4">
-        {getValue() ? ((getValue() as boolean) ? "Yes" : "No") : null}
+        {(() => {
+          switch (getValue() as React.ReactNode) {
+            case "TODO":
+              return "To Do";
+            case "IN_PROGRESS":
+              return "In Progress";
+            case "DONE":
+              return "Completed";
+            default:
+              return "";
+          }
+        })()}
       </div>
     ),
   },

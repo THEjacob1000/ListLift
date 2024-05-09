@@ -4,7 +4,7 @@ export const FETCH_TASKS = gql`
   query getTasks {
     getAllTasks {
       category
-      completed
+      status
       deadline
       description
       id
@@ -22,7 +22,7 @@ export const CREATE_TASK = gql`
       description
       priority
       deadline
-      completed
+      status
       category
     }
   }
@@ -35,7 +35,7 @@ export const UPDATE_TASK = gql`
       description
       priority
       deadline
-      completed
+      status
       category
       id
     }
@@ -46,7 +46,7 @@ export const FIND_TASK = gql`
   query findTask($getTaskId: ID!) {
     getTask(id: $getTaskId) {
       category
-      completed
+      status
       deadline
       description
       priority

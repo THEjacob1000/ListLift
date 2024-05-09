@@ -7,7 +7,7 @@ export type Task = {
   description?: string;
   priority: string;
   deadline?: string;
-  completed: boolean;
+  status: string;
   category?: string;
   [key: string]: any;
 };
@@ -18,7 +18,7 @@ export const formSchema = z.object({
   deadline: z.date().nullable().optional(),
   priority: z.string(),
   category: z.string().optional(),
-  completed: z.boolean().optional(),
+  status: z.string(),
 });
 
 export type DNDType = {

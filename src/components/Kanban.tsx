@@ -78,7 +78,7 @@ const Kanban = () => {
   const groupOptions = [
     { id: "category", name: "Category" },
     { id: "priority", name: "Priority" },
-    { id: "completed", name: "Status" },
+    { id: "status", name: "Status" },
   ];
   const { loading, data: queryData } = useQuery(FETCH_TASKS);
   useEffect(() => {
@@ -122,11 +122,20 @@ const Kanban = () => {
             default:
               groupKey = "Low";
           }
-        } else if (
-          grouping === "completed" &&
-          typeof groupKey === "boolean"
-        ) {
-          groupKey = groupKey ? "Completed" : "Not Completed";
+        } else if (grouping === "status") {
+          switch (groupKey) {
+            case "TODO":
+              groupKey = "To Do";
+              break;
+            case "IN_PROGRESS":
+              groupKey = "In Progress";
+              break;
+            case "DONE":
+              groupKey = "Completed";
+              break;
+            default:
+              groupKey = "Todo";
+          }
         } else if (typeof groupKey !== "string") {
           groupKey = String(groupKey);
         }
@@ -150,8 +159,8 @@ const Kanban = () => {
       });
 
       return sortedGroupedTasks;
-    } else if (grouping === "completed") {
-      const groupOrder = ["Not Completed", "Completed"];
+    } else if (grouping === "status") {
+      const groupOrder = ["To Do", "In Progress", "Completed"];
       const sortedGroupedTasks: { [key: string]: Task[] } = {};
       groupOrder.forEach((key) => {
         if (intermediateGroupedTasks[key]) {
@@ -170,8 +179,9 @@ const Kanban = () => {
       defaultGroups["Low"] = [];
       defaultGroups["Medium"] = [];
       defaultGroups["High"] = [];
-    } else if (grouping === "completed") {
-      defaultGroups["Not Completed"] = [];
+    } else if (grouping === "status") {
+      defaultGroups["To Do"] = [];
+      defaultGroups["In Progress"] = [];
       defaultGroups["Completed"] = [];
     }
 
