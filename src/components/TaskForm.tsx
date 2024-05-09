@@ -57,7 +57,7 @@ const formSchema = z.object({
   deadline: z.date().nullable().optional(),
   priority: z.string(),
   category: z.string().optional(),
-  completed: z.boolean().optional(),
+  status: z.string(),
 });
 
 interface TaskFormProps {
@@ -68,7 +68,7 @@ interface TaskFormProps {
       deadline: Date | null;
       priority: string;
       category: string;
-      completed: boolean;
+      status: string;
     },
     any,
     undefined
@@ -92,8 +92,9 @@ const TaskForm = ({
   const [newCategoryOpen, setNewCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const completedOptions = [
-    { label: "Todo", value: false },
-    { label: "Completed", value: true },
+    { label: "Todo", value: "TODO" },
+    { label: "In Progress", value: "IN_PROGRESS" },
+    { label: "Completed", value: "DONE" },
   ];
   const priorityOptions = [
     { label: "Low", value: "LOW" },
@@ -123,6 +124,11 @@ const TaskForm = ({
     { label: "In 3 days", value: 3 },
     { label: "In 1 week", value: 7 },
   ];
+  const statusIcons = {
+    TODO: <Circle size={16} />,
+    IN_PROGRESS: <Circle size={16} color="#FFAE42" fill="#FFAE42" />,
+    DONE: <CircleCheckBig color="#00FF00" size={16} />,
+  };
   return (
     <DialogContent className="min-w-[80vw]">
       <Form {...form}>
@@ -171,7 +177,7 @@ const TaskForm = ({
             <span className="text-muted-foreground">Status</span>
             <FormField
               control={form.control}
-              name="completed"
+              name="status"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -181,14 +187,11 @@ const TaskForm = ({
                           variant={"outline"}
                           className="flex gap-2 w-32 justify-start"
                         >
-                          {field.value ? (
-                            <CircleCheckBig
-                              color="#00FF00"
-                              size={16}
-                            />
-                          ) : (
-                            <Circle size={16} />
-                          )}
+                          {
+                            statusIcons[
+                              field.value as keyof typeof statusIcons
+                            ]
+                          }
                           {field.value
                             ? completedOptions.find(
                                 (option) =>
@@ -206,14 +209,11 @@ const TaskForm = ({
                             }
                             className="flex gap-2 cursor-pointer"
                           >
-                            {option.value ? (
-                              <CircleCheckBig
-                                color="#00FF00"
-                                size={16}
-                              />
-                            ) : (
-                              <Circle size={16} />
-                            )}
+                            {
+                              statusIcons[
+                                option.value as keyof typeof statusIcons
+                              ]
+                            }
                             {option.label}
                           </DropdownMenuItem>
                         ))}
@@ -247,7 +247,7 @@ const TaskForm = ({
                                 (option) =>
                                   option.value === field.value
                               )?.label
-                            : "Todo"}
+                            : "Low"}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>

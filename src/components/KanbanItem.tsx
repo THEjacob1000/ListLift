@@ -107,7 +107,7 @@ const KanbanItem = ({ id }: KanbanItemProps) => {
                 size={16}
                 fill={getPriorityColor(data.priority as Priority)}
               />
-              {data.completed ? "Completed" : "Not Started"}
+              {data.completed}
             </div>
             <h1 className="text-lg text-card-foreground">
               {data.title}

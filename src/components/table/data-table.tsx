@@ -57,7 +57,8 @@ export function DataTable<TData extends Task, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
-    { id: "completed", desc: false },
+    { id: "status", desc: false },
+    { id: "deadline", desc: false },
   ]);
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>([]);
@@ -222,7 +223,7 @@ export function DataTable<TData extends Task, TValue>({
               const isGrouped = row.subRows && row.subRows.length > 0;
               const groupingColumnId = grouping[0] || "No Category";
               const groupId = row.original[groupingColumnId];
-              const isCompleted = row.original.completed;
+              const isCompleted = row.original.status === "DONE";
               const rowClass = isCompleted
                 ? "text-muted-foreground bg-black/20 line-through"
                 : "";
@@ -252,7 +253,7 @@ export function DataTable<TData extends Task, TValue>({
                         <TableRow
                           key={subRow.id}
                           className={
-                            subRow.original.completed
+                            subRow.original.status === "DONE"
                               ? "bg-muted text-muted-foreground line-through"
                               : ""
                           }

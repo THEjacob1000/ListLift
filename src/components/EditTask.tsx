@@ -47,7 +47,7 @@ const EditTask = ({ id, children }: EditTaskProps) => {
       deadline: data?.deadline ? new Date(data.deadline) : null,
       priority: data?.priority || "LOW",
       category: data?.category || "",
-      completed: data?.completed || false,
+      status: data?.status || "TODO",
     },
   });
   const { toast } = useToast();
@@ -87,7 +87,7 @@ const EditTask = ({ id, children }: EditTaskProps) => {
         deadline: task.deadline ? new Date(task.deadline) : null,
         priority: task.priority,
         category: task.category,
-        completed: task.completed,
+        status: task.status,
       });
     }
     if (!loading2 && queryData2) {
@@ -111,7 +111,7 @@ const EditTask = ({ id, children }: EditTaskProps) => {
       deadline,
       priority,
       category,
-      completed,
+      status,
     } = values || {};
     try {
       await updateTask({
@@ -122,7 +122,7 @@ const EditTask = ({ id, children }: EditTaskProps) => {
             deadline,
             priority,
             category,
-            completed,
+            status,
             id,
           },
         },

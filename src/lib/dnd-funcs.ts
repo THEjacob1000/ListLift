@@ -247,7 +247,7 @@ export const handleDragEnd = async (
   let updatedProperties: {
     category?: string;
     priority?: string;
-    completed?: boolean;
+    status?: string;
   } = {};
   if (grouping === "category") {
     if (overContainerTitle !== null) {
@@ -263,8 +263,16 @@ export const handleDragEnd = async (
     } else {
       updatedProperties.priority = (over.id as string).toUpperCase();
     }
-  } else if (grouping === "completed") {
-    updatedProperties.completed = overContainerTitle === "Completed";
+  } else if (grouping === "status") {
+    if (overContainerTitle !== null) {
+      updatedProperties.status = (overContainerTitle as string)
+        .replace(/\s+/g, "")
+        .toUpperCase();
+    } else {
+      updatedProperties.status = (over.id as string)
+        .replace(/\s+/g, "")
+        .toUpperCase();
+    }
   }
 
   // Use the UPDATE_TASK mutation to update the task in the database

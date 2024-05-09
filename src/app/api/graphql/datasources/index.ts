@@ -7,7 +7,7 @@ interface TaskDocument extends Document {
   description?: string;
   priority: string;
   deadline?: string;
-  completed: boolean;
+  status: string;
   category?: string;
 }
 
@@ -35,9 +35,13 @@ export default class Tasks extends MongoDataSource<TaskDocument> {
     taskInput: Partial<TaskDocument>
   ): Promise<TaskDocument> {
     try {
+      console.log("Creating task with input:", taskInput);
       return await TaskModel.create(taskInput);
     } catch (error: any) {
-      throw new Error(`Failed to create task: ${error.message}`);
+      console.error("Error creating task:", error);
+      throw new Error(
+        `Failed to create task (datasource): ${error.message}`
+      );
     }
   }
 

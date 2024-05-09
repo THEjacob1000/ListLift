@@ -51,7 +51,9 @@ const DeleteCompleted = () => {
     }
   }, [loading, queryData]);
   const deleteCompletedTasks = async () => {
-    const completedTasks = data.filter((task) => task.completed);
+    const completedTasks = data.filter(
+      (task) => task.status === "DONE"
+    );
     for (const task of completedTasks) {
       try {
         await deleteTask({ variables: { id: task.id } });

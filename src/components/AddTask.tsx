@@ -31,7 +31,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
       deadline: null as Date | null,
       priority: "LOW",
       category: "",
-      completed: false,
+      status: "TODO",
     },
   });
 
@@ -42,7 +42,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
       deadline,
       priority,
       category,
-      completed,
+      status,
     } = values || {};
     try {
       await createTask({
@@ -53,7 +53,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
             deadline,
             priority,
             category,
-            completed,
+            status,
           },
         },
         update: (cache, { data }) => {
