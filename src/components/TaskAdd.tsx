@@ -10,7 +10,7 @@ import { useMutation } from "@apollo/client";
 import { CREATE_TASK, FETCH_TASKS } from "@/app/constants";
 import { useToast } from "./ui/use-toast";
 import TaskForm from "./TaskForm";
-import { Task, formSchema } from "@/lib/types";
+import { Task, taskSchema } from "@/lib/types";
 
 interface AddTaskProps {
   categories: string[];
@@ -24,7 +24,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
   const [createTask] = useMutation(CREATE_TASK);
   const { toast } = useToast();
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(taskSchema),
     defaultValues: {
       title: "",
       description: "",
@@ -35,7 +35,7 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof taskSchema>) => {
     const {
       title,
       description,

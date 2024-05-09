@@ -130,7 +130,7 @@ const TaskForm = ({
     DONE: <CircleCheckBig color="#00FF00" size={16} />,
   };
   return (
-    <DialogContent className="min-w-[80vw]">
+    <DialogContent className="min-w-[60vw]">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -288,7 +288,7 @@ const TaskForm = ({
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "pl-3 text-left font-normal",
+                            "pl-3 text-left font-normal w-32 pr-2",
                             !field.value && "text-muted-foreground"
                           )}
                         >

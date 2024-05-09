@@ -18,14 +18,17 @@ const resolvers: Resolvers = {
     },
     getAllProjects: async (_, __, { dataSources }) => {
       try {
-        return await dataSources.projects.getAllProjects();
-      } catch (error) {
-        throw new Error("Failed to fetch projects");
+        return await dataSources.tasks.getAllProjects();
+      } catch (error: any) {
+        throw new Error(
+          "Failed to fetch projects (resolver):",
+          error.message
+        );
       }
     },
     getProject: async (_, { id }, { dataSources }) => {
       try {
-        return await dataSources.projects.getProjectById(id);
+        return await dataSources.tasks.getProjectById(id);
       } catch (error) {
         throw new Error("Failed to fetch project");
       }
@@ -71,7 +74,7 @@ const resolvers: Resolvers = {
     },
     createProject: async (_, { input }, { dataSources }) => {
       try {
-        return await dataSources.projects.createProject(input);
+        return await dataSources.tasks.createProject(input);
       } catch (error: any) {
         console.error("Detailed error: ", error);
         throw new Error(
@@ -84,7 +87,7 @@ const resolvers: Resolvers = {
     updateProject: async (_: any, { input }: any, context: any) => {
       try {
         console.log("Received input for update:", input);
-        return await context.dataSources.projects.updateProject({
+        return await context.dataSources.tasks.updateProject({
           input,
         });
       } catch (error) {
@@ -93,7 +96,7 @@ const resolvers: Resolvers = {
     },
     deleteProject: async (_, { id }, context) => {
       const deleteResult =
-        await context.dataSources.projects.deleteProject({ id });
+        await context.dataSources.tasks.deleteProject({ id });
       if (!deleteResult.success) {
         return {
           id: "",

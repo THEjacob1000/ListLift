@@ -22,8 +22,8 @@ const Options = () => {
   const [activeView, setActiveView] = useState<"list" | "kanban">(
     searchParams.get("activeView") === "kanban" ? "kanban" : "list"
   );
-  const [viewType, setViewType] = useState<"projects" | "tasks">(
-    searchParams.get("viewType") === "projects" ? "projects" : "tasks"
+  const [viewType, setViewType] = useState<"project" | "task">(
+    searchParams.get("viewType") === "project" ? "project" : "task"
   );
   const router = useRouter();
   const pathName = usePathname();
@@ -41,7 +41,7 @@ const Options = () => {
     const view = searchParams.get("view");
     const active = searchParams.get("active");
     if (view) {
-      setViewType(view as "projects" | "tasks");
+      setViewType(view as "project" | "task");
     }
     if (active) {
       setActiveView(active as "list" | "kanban");
@@ -84,10 +84,10 @@ const Options = () => {
           </div>
           <div className="gap-2 flex">
             <Button
-              variant={viewType === "tasks" ? "default" : "ghost"}
-              onClick={() => setViewType("tasks")}
+              variant={viewType === "task" ? "default" : "ghost"}
+              onClick={() => setViewType("task")}
               className={cn(
-                viewType === "tasks"
+                viewType === "task"
                   ? "bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground"
                   : "",
                 "gap-2"
@@ -97,10 +97,10 @@ const Options = () => {
               Tasks
             </Button>
             <Button
-              variant={viewType === "tasks" ? "ghost" : "default"}
-              onClick={() => setViewType("projects")}
+              variant={viewType === "task" ? "ghost" : "default"}
+              onClick={() => setViewType("project")}
               className={cn(
-                viewType === "projects"
+                viewType === "project"
                   ? "bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground"
                   : "",
                 "gap-2"
@@ -112,7 +112,11 @@ const Options = () => {
           </div>
         </div>
       </div>
-      {activeView === "list" ? <TaskTable /> : <Kanban />}
+      {activeView === "list" ? (
+        <TaskTable type={viewType} />
+      ) : (
+        <Kanban />
+      )}
     </div>
   );
 };

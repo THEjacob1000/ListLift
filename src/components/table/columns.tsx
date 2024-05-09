@@ -1,15 +1,23 @@
-import { Task } from "@/lib/types";
+import { Project, Task } from "@/lib/types";
+import { isTask } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
-import EditTask from "../EditTask";
+import EditTask from "../TaskEdit";
 import TaskCheckbox from "../TaskCheckbox";
+import ProjectCheckbox from "../ProjectCheckbox";
 
-export const columns: ColumnDef<Task>[] = [
+export const columns: ColumnDef<Task | Project>[] = [
   {
     accessorKey: "checkbox",
     header: () => <div className="sr-only">Checkbox</div>,
-    cell: ({ row }) => <TaskCheckbox id={row.original.id} />,
+    cell: ({ row }) => {
+      isTask(row.original) ? (
+        <TaskCheckbox id={row.original.id} />
+      ) : (
+        <ProjectCheckbox id={row.original.id} />
+      );
+    },
   },
   {
     accessorKey: "title",
@@ -28,7 +36,9 @@ export const columns: ColumnDef<Task>[] = [
       <div className="text-left ml-4">
         <EditTask id={row.original.id}>
           <span className="flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
-            {row.original.title || "No Title"}
+            {isTask(row.original)
+              ? row.original.title
+              : row.original.name}
           </span>
         </EditTask>
       </div>
@@ -111,6 +121,9 @@ export const columns: ColumnDef<Task>[] = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
     cell: ({ getValue }) => (
       <div className="text-left ml-4">
         {(() => {

@@ -8,7 +8,7 @@ import {
   UPDATE_TASK,
 } from "@/app/constants";
 import { useEffect, useState } from "react";
-import { Task, formSchema } from "@/lib/types";
+import { Task, taskSchema } from "@/lib/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -40,7 +40,7 @@ const EditTask = ({ id, children }: EditTaskProps) => {
   const { loading: loading2, data: queryData2 } =
     useQuery(FETCH_TASKS);
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(taskSchema),
     defaultValues: {
       title: data?.title || "",
       description: data?.description || "",
@@ -104,7 +104,7 @@ const EditTask = ({ id, children }: EditTaskProps) => {
   }, [form, id, loading, loading2, queryData, queryData2]);
   if (loading || loading2) return null;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof taskSchema>) => {
     const {
       title,
       description,

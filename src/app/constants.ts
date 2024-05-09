@@ -10,7 +10,10 @@ export const FETCH_TASKS = gql`
       id
       priority
       title
-      project
+      project {
+        name
+        description
+      }
     }
   }
 `;
@@ -20,7 +23,17 @@ export const FETCH_PROJECTS = gql`
     getAllProjects {
       name
       description
-      tasks
+      tasks {
+        id
+        title
+        description
+        priority
+        deadline
+        status
+        category
+      }
+      deadline
+      status
     }
   }
 `;
@@ -34,6 +47,10 @@ export const FIND_TASK = gql`
       description
       priority
       title
+      project {
+        name
+        description
+      }
     }
   }
 `;
@@ -43,6 +60,7 @@ export const FIND_PROJECT = gql`
     getProject(id: $getProjectId) {
       name
       description
+      deadline
       tasks
     }
   }
@@ -67,6 +85,7 @@ export const CREATE_PROJECT = gql`
     createProject(input: $input) {
       name
       description
+      deadline
     }
   }
 `;
@@ -90,6 +109,7 @@ export const UPDATE_PROJECT = gql`
     updateProject(input: $input) {
       name
       description
+      deadline
       tasks
     }
   }

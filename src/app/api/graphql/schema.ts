@@ -15,6 +15,8 @@ const typeDefs = `#graphql
     id: ID!
     name: String!
     description: String
+    deadline: String
+    status: Status!
     tasks: [Task]
   }
 
@@ -55,11 +57,15 @@ const typeDefs = `#graphql
   input NewProjectInput {
     name: String!
     description: String
+    deadline: String
+    status: Status!
   }
 
   input UpdateProjectInput {
     name: String
     description: String
+    deadline: String
+    status: Status
   }
 
   type DeleteTaskResult {

@@ -17,6 +17,8 @@ interface ProjectDocument extends Document {
   _id: string;
   name: string;
   description?: string;
+  deadline: string;
+  status: string;
   tasks: TaskDocument[];
 }
 
@@ -89,7 +91,8 @@ export class Tasks extends MongoDataSource<TaskDocument> {
   ): Promise<ProjectDocument> {
     try {
       console.log("Creating project with input:", projectInput);
-      return await ProjectModel.create(projectInput);
+      const newProject = new ProjectModel(projectInput);
+      return await newProject.save();
     } catch (error: any) {
       console.error("Error creating project:", error);
       throw new Error(`Failed to create project: ${error.message}`);

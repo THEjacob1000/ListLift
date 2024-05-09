@@ -42,22 +42,29 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Boxes, ChevronDown, ChevronUp } from "lucide-react";
-import { capitalize } from "@/lib/utils";
-import { Task } from "@/lib/types";
-import AddTask from "../AddTask";
+import { capitalize, isTask } from "@/lib/utils";
+import { Task, Project } from "@/lib/types";
+import AddTask from "../TaskAdd";
 import DeleteCompleted from "../DeleteCompleted";
+import AddProject from "../ProjectAdd";
 
-interface DataTableProps<TData extends Task, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
+interface DataTableProps {
+  columns: ColumnDef<Task | Project>[];
+  tasks: Task[];
+  projects: Project[];
+  type: "task" | "project";
 }
 
-export function DataTable<TData extends Task, TValue>({
+type Status = "TODO" | "IN_PROGRESS" | "DONE";
+
+export function DataTable({
   columns,
-  data,
-}: DataTableProps<TData, TValue>) {
+  tasks,
+  projects,
+  type = "task",
+}: DataTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>([
-    { id: "status", desc: false },
+    { id: "status", desc: true },
     { id: "deadline", desc: false },
   ]);
   const [columnFilters, setColumnFilters] =
@@ -65,6 +72,11 @@ export function DataTable<TData extends Task, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [grouping, setGrouping] = React.useState<GroupingState>([]);
+  const [statusView, setStatusView] = React.useState<Status[]>([
+    "TODO",
+    "IN_PROGRESS",
+    "DONE",
+  ] as Status[]);
   const [collapsedGroups, setCollapsedGroups] = React.useState<{
     [key: string]: boolean;
   }>({});
@@ -76,7 +88,7 @@ export function DataTable<TData extends Task, TValue>({
   };
 
   const table = useReactTable({
-    data,
+    data: type === "task" ? tasks : projects,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -100,12 +112,37 @@ export function DataTable<TData extends Task, TValue>({
   ];
   const categoryNames = Array.from(
     new Set(
-      data
+      tasks
         .map((entry) => entry.category)
         .filter((category): category is string => !!category)
     )
   );
-
+  const statusOptions = [
+    {
+      id: "TODO",
+      name: "To do",
+    },
+    {
+      id: "IN_PROGRESS",
+      name: "In Progress",
+    },
+    {
+      id: "DONE",
+      name: "Completed",
+    },
+  ];
+  const changeStatusView = (checked: boolean, status: Status) => {
+    const column = table.getColumn("status");
+    if (column) {
+      if (checked) {
+        column.setFilterValue([...statusView, status]);
+        setStatusView([...statusView, status]);
+      } else {
+        column.setFilterValue(statusView.filter((s) => s !== status));
+        setStatusView(statusView.filter((s) => s !== status));
+      }
+    }
+  };
   return (
     <div className="mt-6">
       <div className="flex items-center w-full justify-between py-4">
@@ -192,9 +229,33 @@ export function DataTable<TData extends Task, TValue>({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto">
+                Status: {statusView.length}{" "}
+                {statusView.length === 1 ? "Status" : "Statuses"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {statusOptions.map((status) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={status.name}
+                    checked={statusView.includes(status.id as Status)}
+                    onCheckedChange={(value) =>
+                      changeStatusView(value, status.id as Status)
+                    }
+                  >
+                    {status.name}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="flex gap-2">
           <DeleteCompleted />
+          <AddProject />
           <AddTask categories={categoryNames} />
         </div>
       </div>
@@ -222,7 +283,9 @@ export function DataTable<TData extends Task, TValue>({
             {table.getRowModel().rows.map((row) => {
               const isGrouped = row.subRows && row.subRows.length > 0;
               const groupingColumnId = grouping[0] || "No Category";
-              const groupId = row.original[groupingColumnId];
+              const groupId = isTask(row.original)
+                ? row.original[groupingColumnId]
+                : null;
               const isCompleted = row.original.status === "DONE";
               const rowClass = isCompleted
                 ? "text-muted-foreground bg-black/20 line-through"
