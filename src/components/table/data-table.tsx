@@ -57,7 +57,7 @@ export function DataTable<TData extends Task, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([
-    { id: "status", desc: false },
+    { id: "status", desc: true },
     { id: "deadline", desc: false },
   ]);
   const [columnFilters, setColumnFilters] =

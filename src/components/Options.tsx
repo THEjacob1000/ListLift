@@ -22,27 +22,18 @@ const Options = () => {
   const [activeView, setActiveView] = useState<"list" | "kanban">(
     searchParams.get("activeView") === "kanban" ? "kanban" : "list"
   );
-  const [viewType, setViewType] = useState<"projects" | "tasks">(
-    searchParams.get("viewType") === "projects" ? "projects" : "tasks"
-  );
   const router = useRouter();
   const pathName = usePathname();
 
   useEffect(() => {
     if (pathName === "/") {
-      router.push(`?activeView=${activeView}&viewType=${viewType}`);
+      router.push(`?activeView=${activeView}`);
     } else {
-      router.replace(
-        `?activeView=${activeView}&viewType=${viewType}`
-      );
+      router.replace(`?activeView=${activeView}`);
     }
-  }, [activeView, pathName, router, viewType]);
+  }, [activeView, pathName, router]);
   useEffect(() => {
-    const view = searchParams.get("view");
     const active = searchParams.get("active");
-    if (view) {
-      setViewType(view as "projects" | "tasks");
-    }
     if (active) {
       setActiveView(active as "list" | "kanban");
     }
@@ -80,34 +71,6 @@ const Options = () => {
             >
               <Columns4 size={24} />
               Kanban
-            </Button>
-          </div>
-          <div className="gap-2 flex">
-            <Button
-              variant={viewType === "tasks" ? "default" : "ghost"}
-              onClick={() => setViewType("tasks")}
-              className={cn(
-                viewType === "tasks"
-                  ? "bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground"
-                  : "",
-                "gap-2"
-              )}
-            >
-              <SquareCheckBig size={24} />
-              Tasks
-            </Button>
-            <Button
-              variant={viewType === "tasks" ? "ghost" : "default"}
-              onClick={() => setViewType("projects")}
-              className={cn(
-                viewType === "projects"
-                  ? "bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground"
-                  : "",
-                "gap-2"
-              )}
-            >
-              <FolderDot size={24} />
-              Projects
             </Button>
           </div>
         </div>
