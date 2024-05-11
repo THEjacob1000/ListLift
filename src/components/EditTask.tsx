@@ -170,7 +170,6 @@ const EditTask = ({ id, children }: EditTaskProps) => {
       <TaskForm
         categories={categories}
         form={form}
-        isOpen={isOpen}
         setIsOpen={setIsOpen}
         onSubmit={onSubmit}
         type="edit"

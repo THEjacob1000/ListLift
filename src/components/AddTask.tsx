@@ -96,7 +96,6 @@ const AddTask = ({ categories = [] }: AddTaskProps) => {
         form={form}
         categories={categories}
         onSubmit={onSubmit}
-        isOpen={isOpen}
         setIsOpen={setIsOpen}
         type={"new"}
       />

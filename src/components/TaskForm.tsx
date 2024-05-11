@@ -76,7 +76,6 @@ interface TaskFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   categories: string[];
   setIsOpen: (isOpen: boolean) => void;
-  isOpen: boolean;
   type: "new" | "edit";
   onDelete?: () => void;
 }
