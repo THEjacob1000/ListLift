@@ -4,6 +4,7 @@ import "./globals.css";
 import { ApolloProvider } from "@apollo/client";
 import client from "./apollo-client";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,8 +17,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ApolloProvider client={client}>
-          {children}
-          <Toaster />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster />
+          </ThemeProvider>
         </ApolloProvider>
       </body>
     </html>
