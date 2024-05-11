@@ -77,7 +77,6 @@ const TaskCalendar = () => {
           });
         }
       } else {
-        // Log or handle the unsuccessful deletion message
         console.error(data.deleteTask.message);
       }
     },
@@ -127,6 +126,7 @@ const TaskCalendar = () => {
       });
     }
   }, []);
+
   useEffect(() => {
     const events = allEvents.map((event) => ({
       id: event.id,
@@ -182,10 +182,9 @@ const TaskCalendar = () => {
   };
 
   const handleDeleteModal = (data: any) => {
-    console.log(data);
-    const task = allEvents.filter(
-      (event) => event.id === data.event.id
-    )[0];
+    const taskId = data.event._def.publicId;
+    const task = allEvents.find((event) => event.id === taskId);
+    if (!task) return;
     form.reset({
       title: task?.title || "",
       description: task?.description || "",
@@ -195,7 +194,7 @@ const TaskCalendar = () => {
       status: task?.status || "TODO",
     });
     setShowDeleteModal(true);
-    setIdToDelete(data.event.id);
+    setIdToDelete(task._id);
   };
 
   const onDelete = async () => {
@@ -248,6 +247,7 @@ const TaskCalendar = () => {
       });
       refetch({ getTaskId: id });
       setShowDeleteModal(false);
+      setShowModal(false); // Close the modal after updating the task
       toast({
         title: "Task updated",
         description: "The task has been updated successfully",
@@ -259,7 +259,6 @@ const TaskCalendar = () => {
       });
     }
   };
-
   return (
     <div className="mt-6 w-full">
       <div className="grid grid-cols-10 w-full">
