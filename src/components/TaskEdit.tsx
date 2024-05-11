@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useToast } from "./ui/use-toast";
 import { Dialog, DialogTrigger } from "./ui/dialog";
 
-interface EditTaskProps {
+interface TaskEditProps {
   id: string;
   children: React.ReactNode;
 }
@@ -23,7 +23,7 @@ interface TasksData {
   getAllTasks: Task[];
 }
 
-const EditTask = ({ id, children }: EditTaskProps) => {
+const TaskEdit = ({ id, children }: TaskEditProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<Task>();
   const [categories, setCategories] = useState<string[]>([]);
@@ -179,4 +179,4 @@ const EditTask = ({ id, children }: EditTaskProps) => {
   );
 };
 
-export default EditTask;
+export default TaskEdit;

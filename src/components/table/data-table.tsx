@@ -44,7 +44,7 @@ import {
 import { Boxes, ChevronDown, ChevronUp } from "lucide-react";
 import { capitalize } from "@/lib/utils";
 import { Task } from "@/lib/types";
-import AddTask from "../AddTask";
+import AddTask from "../TaskAdd";
 import DeleteCompleted from "../DeleteCompleted";
 
 interface DataTableProps<TData extends Task, TValue> {

@@ -28,6 +28,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Dialog } from "./ui/dialog";
+import TaskAdd from "./TaskAdd";
 
 type newTask = {
   title: string;
@@ -261,7 +262,7 @@ const TaskCalendar = () => {
   };
   return (
     <div className="mt-6 w-full">
-      <div className="grid grid-cols-10 w-full">
+      <div className="grid grid-cols-10 w-full pr-8">
         <div className="col-span-8">
           <FullCalendar
             plugins={[
@@ -272,12 +273,12 @@ const TaskCalendar = () => {
             headerToolbar={{
               left: "prev,next today",
               center: "title",
-              right:
-                "resourceTimelineWeek, dayGridMonth,timeGridWeek",
+              right: "dayGridMonth,dayGridWeek",
             }}
             events={dateEvents}
             nowIndicator={true}
-            editable={true}
+            eventStartEditable={true}
+            eventDurationEditable={false}
             droppable={true}
             selectable={true}
             selectMirror={true}
@@ -288,13 +289,13 @@ const TaskCalendar = () => {
         </div>
         <ScrollArea
           id="draggable-el"
-          className="w-full border-2 p-2 px-3 rounded-md mt-16 lg:h-1/2 bg-background overflow-hidden col-span-2 mx-8"
+          className="w-full border-2 p-2 px-3 rounded-md mt-[4.5rem] lg:h-1/2 bg-background overflow-hidden col-span-2 mx-8"
         >
           <h1 className="font-bold text-lg text-center">Drag Task</h1>
 
           {events.map((event) => (
             <div
-              className="fc-event border-2 p-1 m-2 w-full rounded-md ml-auto text-center bg-primary hover:cursor-pointer"
+              className="fc-event border-2 p-1 m-2 w-full rounded-md ml-auto text-center text-secondary-foreground hover:bg-secondary/80 bg-secondary hover:cursor-pointer"
               title={event.title}
               key={event.id}
               id={event.id}
@@ -302,6 +303,12 @@ const TaskCalendar = () => {
               {event.title}
             </div>
           ))}
+          <div className="w-full flex justify-center mt-6">
+            <TaskAdd
+              categories={categories}
+              className="hover:bg-accent hover:text-accent-foreground bg-background text-foreground w-full ml-0"
+            />
+          </div>
         </ScrollArea>
       </div>
       <Dialog

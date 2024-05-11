@@ -12,7 +12,7 @@ import { Task } from "@/lib/types";
 import { Card } from "./ui/card";
 import { Flag, FolderDot } from "lucide-react";
 import { Checkbox } from "./ui/checkbox";
-import EditTask from "./EditTask";
+import EditTask from "./TaskEdit";
 import { format } from "date-fns";
 
 interface KanbanItemProps {
