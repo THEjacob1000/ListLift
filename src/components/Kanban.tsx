@@ -14,7 +14,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Boxes, Container } from "lucide-react";
 import { capitalize } from "@/lib/utils";
-import AddTask from "./AddTask";
+import AddTask from "./TaskAdd";
 import DeleteCompleted from "./DeleteCompleted";
 import { FETCH_TASKS, FIND_TASK } from "@/app/constants";
 import { useQuery } from "@apollo/client";

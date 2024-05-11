@@ -2,7 +2,7 @@ import { Task } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
-import EditTask from "../EditTask";
+import EditTask from "../TaskEdit";
 import TaskCheckbox from "../TaskCheckbox";
 
 export const columns: ColumnDef<Task>[] = [
