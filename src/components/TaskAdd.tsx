@@ -12,6 +12,10 @@ import { useToast } from "./ui/use-toast";
 import TaskForm from "./TaskForm";
 import { cn } from "@/lib/utils";
 import { Task, formSchema } from "@/lib/types";
+import { useMediaQuery } from "react-responsive";
+import { Drawer, DrawerTrigger } from "./ui/drawer";
+import { Plus } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface TaskAddProps {
   categories: string[];
@@ -89,16 +93,36 @@ const TaskAdd = ({ categories = [], className }: TaskAddProps) => {
     }
   };
 
+  const isDesktop = useMediaQuery({ minWidth: 768 });
+
+  if (isDesktop)
+    return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger
+          className={cn(
+            "ml-2 bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4",
+            className
+          )}
+        >
+          Add Task
+        </DialogTrigger>
+        <TaskForm
+          form={form}
+          categories={categories}
+          onSubmit={onSubmit}
+          setIsOpen={setIsOpen}
+          type={"new"}
+        />
+      </Dialog>
+    );
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger
-        className={cn(
-          "ml-2 bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4",
-          className
-        )}
-      >
-        Add Task
-      </DialogTrigger>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger asChild>
+        <Button className="fixed right-10 rounded-full px-4 py-7 bottom-28">
+          <Plus size={24} />
+        </Button>
+      </DrawerTrigger>
       <TaskForm
         form={form}
         categories={categories}
@@ -106,7 +130,7 @@ const TaskAdd = ({ categories = [], className }: TaskAddProps) => {
         setIsOpen={setIsOpen}
         type={"new"}
       />
-    </Dialog>
+    </Drawer>
   );
 };
 

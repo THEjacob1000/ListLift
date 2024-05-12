@@ -1,31 +1,29 @@
-"use client";
-import { useMutation, useQuery } from "@apollo/client";
-import TaskForm from "./TaskForm";
-import {
-  DELETE_TASK,
-  FETCH_TASKS,
-  FIND_TASK,
-  UPDATE_TASK,
-} from "@/app/constants";
-import { useEffect, useState } from "react";
 import { Task, formSchema } from "@/lib/types";
-import { useForm } from "react-hook-form";
+import { Drawer, DrawerTrigger } from "./ui/drawer";
+import { Circle, CircleCheckBig } from "lucide-react";
+import {
+  FIND_TASK,
+  FETCH_TASKS,
+  UPDATE_TASK,
+  DELETE_TASK,
+} from "@/app/constants";
+import { useQuery, useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useToast } from "./ui/use-toast";
-import { Dialog, DialogTrigger } from "./ui/dialog";
-import { useMediaQuery } from "react-responsive";
-import { Drawer, DrawerTrigger } from "./ui/drawer";
+import TaskForm from "./TaskForm";
 
-interface TaskEditProps {
-  id: string;
-  children: React.ReactNode;
+interface MobileTaskItemProps {
+  task: Task;
 }
+
 interface TasksData {
   getAllTasks: Task[];
 }
 
-const TaskEdit = ({ id, children }: TaskEditProps) => {
+const MobileTaskItem = ({ task }: MobileTaskItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState<Task>();
   const [categories, setCategories] = useState<string[]>([]);
@@ -34,7 +32,7 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
     data: queryData,
     refetch,
   } = useQuery(FIND_TASK, {
-    variables: { getTaskId: id },
+    variables: { getTaskId: task.id },
     onError: (error) => {
       console.error("Error fetching task:", error);
     },
@@ -103,9 +101,7 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
       );
       setCategories(categoryNames);
     }
-  }, [form, id, loading, loading2, queryData, queryData2]);
-  const isDesktop = useMediaQuery({ minWidth: 768 });
-
+  }, [form, loading, loading2, queryData, queryData2]);
   if (loading || loading2) return null;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -127,11 +123,11 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
             priority,
             category,
             status,
-            id,
+            id: task.id,
           },
         },
       });
-      refetch({ getTaskId: id });
+      refetch({ getTaskId: task.id });
       setIsOpen(false);
       toast({
         title: "Task updated",
@@ -147,7 +143,9 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
 
   const onDelete = async () => {
     try {
-      const response = await deleteTask({ variables: { id: id } });
+      const response = await deleteTask({
+        variables: { id: task.id },
+      });
       if (response.data.deleteTask.success) {
         toast({
           title: "Task deleted",
@@ -166,25 +164,22 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
       });
     }
   };
-  if (isDesktop)
-    return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden focus:border-none active:border-none focus:outline-none border-none outline-none focus-visible:ring-transparent">
-          {children}
-        </DialogTrigger>
-        <TaskForm
-          categories={categories}
-          form={form}
-          setIsOpen={setIsOpen}
-          onSubmit={onSubmit}
-          type="edit"
-          onDelete={onDelete}
-        />
-      </Dialog>
-    );
+  const statusIcons = {
+    TODO: <Circle size={16} />,
+    IN_PROGRESS: <Circle size={16} color="#FFAE42" fill="#FFAE42" />,
+    DONE: <CircleCheckBig color="#00FF00" size={16} />,
+  };
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
-      <DrawerTrigger>{children}</DrawerTrigger>
+    <Drawer key={task.id}>
+      <DrawerTrigger className="flex gap-2 bg-secondary p-4 rounded-lg w-full flex-col items-start justify-center">
+        <div>
+          <div className="flex w-full justify-start gap-2 items-center">
+            {statusIcons[task.status as keyof typeof statusIcons]}
+            <div>{task.title}</div>
+          </div>
+        </div>
+        <div className="text-muted-foreground">{task.category}</div>
+      </DrawerTrigger>
       <TaskForm
         categories={categories}
         form={form}
@@ -197,4 +192,4 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
   );
 };
 
-export default TaskEdit;
+export default MobileTaskItem;

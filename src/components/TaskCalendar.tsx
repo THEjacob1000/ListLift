@@ -263,7 +263,7 @@ const TaskCalendar = () => {
   return (
     <div className="mt-6 w-full">
       <div className="grid grid-cols-10 w-full pr-8">
-        <div className="col-span-8">
+        <div className="md:col-span-8 col-span-10">
           <FullCalendar
             plugins={[
               dayGridPlugin,
@@ -289,7 +289,7 @@ const TaskCalendar = () => {
         </div>
         <ScrollArea
           id="draggable-el"
-          className="w-full border-2 p-2 px-3 rounded-md mt-[4.5rem] lg:h-1/2 bg-background overflow-hidden col-span-2 mx-8"
+          className="w-full border-2 p-2 px-3 rounded-md mt-[4.5rem] lg:h-1/2 bg-background overflow-hidden col-span-2 mx-8 md:flex hidden"
         >
           <h1 className="font-bold text-lg text-center">Drag Task</h1>
 

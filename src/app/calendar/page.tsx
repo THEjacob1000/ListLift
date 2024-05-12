@@ -1,11 +1,8 @@
-"use client";
 import Heading from "@/components/Heading";
-import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import TaskCalendar from "@/components/TaskCalendar";
+import { Suspense } from "react";
 
-export default function Home() {
-  const router = useRouter();
-  router.push("/list");
+const Page = () => {
   return (
     <div className="bg-accent">
       <div className="bg-background pt-6">
@@ -14,9 +11,12 @@ export default function Home() {
             <Heading as="h2" size="sm">
               My Tasks
             </Heading>
+            <TaskCalendar />
           </div>
         </Suspense>
       </div>
     </div>
   );
-}
+};
+
+export default Page;

@@ -5,6 +5,8 @@ import { ApolloProvider } from "@apollo/client";
 import client from "./apollo-client";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "@/components/Navbar";
+import MobileNav from "@/components/MobileNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +25,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Navbar />
             {children}
+            <MobileNav />
             <Toaster />
           </ThemeProvider>
         </ApolloProvider>
