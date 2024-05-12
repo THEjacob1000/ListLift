@@ -4,54 +4,29 @@ import Heading from "./Heading";
 import { Button } from "./ui/button";
 import { AlignLeft, Columns4, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
-import TaskTable from "./TaskTable";
-import Kanban from "./Kanban";
-import {
-  usePathname,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
-import FullCalendar from "./TaskCalendar";
+import { usePathname, useRouter } from "next/navigation";
 import { ModeToggle } from "./ModeToggle";
 
 const Navbar = () => {
-  const searchParams = useSearchParams();
-  const [activeView, setActiveView] = useState<
-    "list" | "kanban" | "calendar"
-  >(
-    (searchParams.get("activeView") as
-      | "list"
-      | "kanban"
-      | "calendar") ?? "list"
-  );
-  const router = useRouter();
   const pathName = usePathname();
+  const router = useRouter();
+  const activeView = pathName.split("/")[1];
+  const changeActiveView = (view: string) => {
+    router.replace(`/${view}`);
+  };
 
-  useEffect(() => {
-    if (pathName === "/") {
-      router.push(`?activeView=${activeView}`);
-    } else {
-      router.replace(`?activeView=${activeView}`);
-    }
-  }, [activeView, pathName, router]);
-  useEffect(() => {
-    const active = searchParams.get("active");
-    if (active) {
-      setActiveView(active as "list" | "kanban" | "calendar");
-    }
-  }, [searchParams]);
   return (
     <div className="mx-12 flex flex-col">
       <div className="flex justify-between items-center">
         <Heading as="h1" size="sm" className="py-2 px-10">
           ListLift
         </Heading>
-        <div className="flex justify-between items-center gap-8 px-10">
+        <div className="md:flex hidden justify-between items-center gap-8 px-10">
           <div className="flex justify-center items-center gap-8">
             <div className="flex gap-2">
               <Button
                 variant={activeView === "list" ? "default" : "ghost"}
-                onClick={() => setActiveView("list")}
+                onClick={() => changeActiveView("list")}
                 className={cn(
                   activeView === "list"
                     ? "bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground"
@@ -67,7 +42,7 @@ const Navbar = () => {
                   activeView === "kanban" ? "default" : "ghost"
                 }
                 disabled={activeView === "kanban"}
-                onClick={() => setActiveView("kanban")}
+                onClick={() => changeActiveView("kanban")}
                 className={"gap-2"}
               >
                 <Columns4 size={24} />
@@ -77,7 +52,7 @@ const Navbar = () => {
                 variant={
                   activeView === "calendar" ? "default" : "ghost"
                 }
-                onClick={() => setActiveView("calendar")}
+                onClick={() => changeActiveView("calendar")}
                 className={cn(
                   activeView === "calendar"
                     ? "bg-muted text-muted-foreground hover:bg-muted hover:text-muted-foreground"

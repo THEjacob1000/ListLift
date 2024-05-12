@@ -1,3 +1,4 @@
+"use client";
 import { Task } from "@/lib/types";
 import { DataTable } from "./table/data-table";
 import { columns } from "./table/columns";
