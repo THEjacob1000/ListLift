@@ -13,7 +13,7 @@ const MobileNav = () => {
     router.replace(`/${view}`);
   };
   return (
-    <div className="w-full md:hidden h-24 p-1 bg-card/70 rounded-md gap-1 z-50 fixed bottom-4">
+    <div className="w-full md:hidden h-24 p-1 bg-card/70 rounded-md gap-1 z-50 fixed bottom-0">
       <div className="relative m-2 bg-card rounded-md flex items-center gap-1 overflow-hidden pr-12 pl-4">
         <Button
           className={cn(

@@ -16,7 +16,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className="mx-12 flex flex-col">
+    <div className="mx-12 md:flex hidden flex-col">
       <div className="flex justify-between items-center">
         <Heading as="h1" size="sm" className="py-2 px-10">
           ListLift
