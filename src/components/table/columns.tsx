@@ -2,7 +2,7 @@ import { Task } from "@/lib/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "../ui/button";
-import EditTask from "../TaskEdit";
+import TaskEdit from "../TaskEdit";
 import TaskCheckbox from "../TaskCheckbox";
 
 export const columns: ColumnDef<Task>[] = [
@@ -26,11 +26,11 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => (
       <div className="text-left ml-4">
-        <EditTask id={row.original.id}>
+        <TaskEdit id={row.original.id}>
           <span className="flex-1 text-ellipsis overflow-hidden whitespace-nowrap">
             {row.original.title || "No Title"}
           </span>
-        </EditTask>
+        </TaskEdit>
       </div>
     ),
   },

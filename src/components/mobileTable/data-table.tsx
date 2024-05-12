@@ -43,6 +43,7 @@ import { Task } from "@/lib/types";
 import { capitalize } from "@/lib/utils";
 import { Drawer, DrawerContent, DrawerTrigger } from "../ui/drawer";
 import Heading from "../Heading";
+import TaskAdd from "../TaskAdd";
 
 interface MobileDataTableProps<TData extends Task, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -106,6 +107,13 @@ export function MobileDataTable<TData extends Task, TValue>({
     { id: "priority", name: "Priority" },
   ];
 
+  const categoryNames = Array.from(
+    new Set(
+      data
+        .map((entry) => entry.category)
+        .filter((category): category is string => !!category)
+    )
+  );
   return (
     <div className="mt-6 pr-8 mb-20">
       <div className="flex items-center w-full justify-between py-4">
@@ -302,7 +310,7 @@ export function MobileDataTable<TData extends Task, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-start space-x-2 py-4">
         <Button
           variant="outline"
           size="sm"
@@ -320,6 +328,7 @@ export function MobileDataTable<TData extends Task, TValue>({
           Next
         </Button>
       </div>
+      <TaskAdd categories={categoryNames} />
     </div>
   );
 }

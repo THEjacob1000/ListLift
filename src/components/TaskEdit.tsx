@@ -14,6 +14,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "./ui/use-toast";
 import { Dialog, DialogTrigger } from "./ui/dialog";
+import { useMediaQuery } from "react-responsive";
+import { Drawer, DrawerTrigger } from "./ui/drawer";
 
 interface TaskEditProps {
   id: string;
@@ -102,6 +104,8 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
       setCategories(categoryNames);
     }
   }, [form, id, loading, loading2, queryData, queryData2]);
+  const isDesktop = useMediaQuery({ minWidth: 768 });
+
   if (loading || loading2) return null;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -162,11 +166,25 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
       });
     }
   };
+  if (isDesktop)
+    return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden focus:border-none active:border-none focus:outline-none border-none outline-none focus-visible:ring-transparent">
+          {children}
+        </DialogTrigger>
+        <TaskForm
+          categories={categories}
+          form={form}
+          setIsOpen={setIsOpen}
+          onSubmit={onSubmit}
+          type="edit"
+          onDelete={onDelete}
+        />
+      </Dialog>
+    );
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger className="w-full h-full flex items-center justify-start text-left p-2 cursor-pointer overflow-hidden focus:border-none active:border-none focus:outline-none border-none outline-none focus-visible:ring-transparent">
-        {children}
-      </DialogTrigger>
+    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+      <DrawerTrigger>{children}</DrawerTrigger>
       <TaskForm
         categories={categories}
         form={form}
@@ -175,7 +193,7 @@ const TaskEdit = ({ id, children }: TaskEditProps) => {
         type="edit"
         onDelete={onDelete}
       />
-    </Dialog>
+    </Drawer>
   );
 };
 
