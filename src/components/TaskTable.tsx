@@ -5,6 +5,8 @@ import { columns } from "./table/columns";
 import { useQuery } from "@apollo/client";
 import { FETCH_TASKS } from "@/app/constants";
 import { useEffect, useState } from "react";
+import { useMediaQuery } from "react-responsive";
+import { MobileDataTable } from "./mobileTable/data-table";
 
 const TaskTable = () => {
   const [data, setData] = useState<Task[]>([]);
@@ -15,7 +17,9 @@ const TaskTable = () => {
       setData(tasks);
     }
   }, [loading, queryData]);
-  return <DataTable columns={columns} data={data} />;
+  const isDesktop = useMediaQuery({ query: "(min-width: 768px)" });
+  if (isDesktop) return <DataTable columns={columns} data={data} />;
+  return <MobileDataTable columns={columns} data={data} />;
 };
 
 export default TaskTable;
