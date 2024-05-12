@@ -32,7 +32,7 @@ const Page = () => {
   );
 
   return (
-    <div className="pl-2 pr-8 mx-4 flex flex-col gap-4 mt-4">
+    <div className="px-3 mx-4 flex flex-col gap-4 mt-4">
       <Heading as="h2" size="sm">
         My Tasks
       </Heading>

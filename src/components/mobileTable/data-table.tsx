@@ -115,7 +115,7 @@ export function MobileDataTable<TData extends Task, TValue>({
     )
   );
   return (
-    <div className="mt-6 pr-8 mb-20">
+    <div className="mt-6  mb-20">
       <div className="flex items-center w-full justify-between py-4">
         <div className="flex gap-2 justify-between w-full">
           <Heading as="h2" size="sm">
